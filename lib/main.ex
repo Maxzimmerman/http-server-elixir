@@ -18,20 +18,14 @@ defmodule Server do
 
     {:ok, content} = :gen_tcp.recv(client, 0)
 
-    IO.inspect(decode_http_request(content))
-
     request = decode_http_request(content)
 
     response =
       if request.line.target == "/" do
-        IO.inspect(request.line.target, label: "TEST")
-
         """
         HTTP/1.1 200 OK\r\n\r\n
         """
       else
-        IO.inspect(request.line.target, label: "TEST")
-
         """
         HTTP/1.1 404 Not Found\r\n\r\n
         """
@@ -43,8 +37,6 @@ defmodule Server do
   def decode_http_request(request) do
     [line, headers | rest] = String.split(request, "\r\n")
     [method, target, version] = String.split(line, " ")
-    IO.inspect(line, label: "TEST 2")
-    IO.inspect(target, label: "TEST 3")
 
     if is_nil(rest) do
       %HTTPRequest{
