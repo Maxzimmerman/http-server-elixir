@@ -24,7 +24,7 @@ defmodule Server do
 
     response =
       if request.line["target"] == "/" do
-        IO.puts(request.line["target"])
+        IO.inspect(request.line["target"], label: "TEST")
 
         """
         HTTP/1.1 200 OK\r\n\r\n
