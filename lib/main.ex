@@ -16,7 +16,9 @@ defmodule Server do
     {:ok, socket} = :gen_tcp.listen(4221, [:binary, active: false, reuseaddr: true])
     {:ok, client} = :gen_tcp.accept(socket)
 
-    IO.inspect(client)
+    {:ok, content} = :gen_tcp.recv(client, 0)
+
+    IO.inspect(content)
 
     response =
       """
