@@ -20,8 +20,10 @@ defmodule Server do
 
     IO.inspect(decode_http_request(content))
 
+    request = decode_http_request(content)
+
     response =
-      if String.contains?("", "/") do
+      if String.contains?(request.line, "/") do
         """
         HTTP/1.1 200 OK\r\n\r\n
         """
