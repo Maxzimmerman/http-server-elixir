@@ -23,7 +23,7 @@ defmodule Server do
     request = decode_http_request(content)
 
     response =
-      if String.contains?(request.line, "/") do
+      if request.line["target"] == "/" do
         """
         HTTP/1.1 200 OK\r\n\r\n
         """
@@ -38,9 +38,14 @@ defmodule Server do
 
   def decode_http_request(request) do
     [line, headers | rest] = String.split(request, "\r\n")
+    [method, target, version] = String.split(line)
 
     if is_nil(rest) do
-      %HTTPRequest{line: line, headers: headers, body: rest}
+      %HTTPRequest{
+        line: %{method: method, target: target, version: version},
+        headers: headers,
+        body: rest
+      }
     else
       %HTTPRequest{line: line, headers: headers}
     end
