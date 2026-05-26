@@ -27,6 +27,8 @@ defmodule Server do
         HTTP/1.1 200 OK\r\n\r\n
         """
       else
+        IO.puts(url)
+
         """
         HTTP/1.1 404 Not Found\r\n\r\n
         """
