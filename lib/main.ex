@@ -18,7 +18,7 @@ defmodule Server do
 
     {:ok, content} = :gen_tcp.recv(client, 0)
 
-    IO.inspect(content)
+    IO.inspect(String.split(content, " "))
 
     response =
       """
