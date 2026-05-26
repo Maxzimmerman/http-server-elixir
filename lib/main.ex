@@ -18,12 +18,19 @@ defmodule Server do
 
     {:ok, content} = :gen_tcp.recv(client, 0)
 
-    IO.inspect(String.split(content, " "))
+    IO.inspect(client)
+    url = Enum.at(String.split(content, " "), 1)
 
     response =
-      """
-      HTTP/1.1 200 OK\r\n\r\n
-      """
+      if url == "/index.html" do
+        """
+        HTTP/1.1 200 OK\r\n\r\n
+        """
+      else
+        """
+        HTTP/1.1 404 Not Found\r\n\r\n
+        """
+      end
 
     :gen_tcp.send(client, response)
   end
