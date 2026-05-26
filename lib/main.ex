@@ -22,7 +22,7 @@ defmodule Server do
     url = Enum.at(String.split(content, " "), 1)
 
     response =
-      if url == "/index.html" do
+      if String.contains?(url, "/") do
         """
         HTTP/1.1 200 OK\r\n\r\n
         """
