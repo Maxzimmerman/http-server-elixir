@@ -18,23 +18,30 @@ defmodule Server do
 
     {:ok, content} = :gen_tcp.recv(client, 0)
 
-    IO.inspect(client)
-    url = Enum.at(String.split(content, " "), 1)
+    IO.inspect(decode_http_request(content))
 
     response =
-      if String.contains?(url, "/") do
+      if String.contains?("", "/") do
         """
         HTTP/1.1 200 OK\r\n\r\n
         """
       else
-        IO.puts(url)
-
         """
         HTTP/1.1 404 Not Found\r\n\r\n
         """
       end
 
     :gen_tcp.send(client, response)
+  end
+
+  def decode_http_request(request) do
+    [line, headers | rest] = String.split(request, "\r\n")
+
+    if is_nil(rest) do
+      %HTTPRequest{line: line, headers: headers, body: rest}
+    else
+      %HTTPRequest{line: line, headers: headers}
+    end
   end
 
   def main(_args) do
