@@ -23,14 +23,14 @@ defmodule Server do
     request = decode_http_request(content)
 
     response =
-      if request.line["target"] == "/" do
-        IO.inspect(request.line["target"], label: "TEST")
+      if request.line.target == "/" do
+        IO.inspect(request.line.target, label: "TEST")
 
         """
         HTTP/1.1 200 OK\r\n\r\n
         """
       else
-        IO.inspect(request.line["target"], label: "TEST")
+        IO.inspect(request.line.target, label: "TEST")
 
         """
         HTTP/1.1 404 Not Found\r\n\r\n
