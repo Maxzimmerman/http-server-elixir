@@ -47,7 +47,11 @@ defmodule Server do
         body: rest
       }
     else
-      %HTTPRequest{line: line, headers: headers}
+      %HTTPRequest{
+        line: %{method: method, target: target, version: version},
+        headers: headers,
+        body: nil
+      }
     end
   end
 
