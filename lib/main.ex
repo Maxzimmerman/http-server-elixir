@@ -51,7 +51,10 @@ defmodule Server do
 
     %HTTPRequest{
       line: %{method: method, target: target, version: version},
-      headers: headers,
+      headers:
+        Enum.map(headers, fn header ->
+          Map.new(String.split(":"))
+        end),
       body: body
     }
   end
