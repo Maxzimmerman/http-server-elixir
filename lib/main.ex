@@ -31,6 +31,9 @@ defmodule Server do
         %HTTPRequest{line: %{target: "/echo/" <> str}} ->
           "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: #{String.length(str)}\r\n\r\n#{str}"
 
+        %HTTPRequest{line: %{target: "/user-agent"}} ->
+          IO.puts("RIGHT")
+
         _ ->
           """
           HTTP/1.1 404 Not Found\r\n\r\n
