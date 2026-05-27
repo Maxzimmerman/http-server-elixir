@@ -19,7 +19,6 @@ defmodule Server do
     {:ok, content} = :gen_tcp.recv(client, 0)
 
     request = decode_http_request(content)
-    IO.inspect(request, label: "TEST")
 
     response =
       case request do
@@ -43,7 +42,7 @@ defmodule Server do
   def decode_http_request(request) do
     [line, headers | rest] = String.split(request, "\r\n")
     [method, target, version] = String.split(line, " ")
-    IO.inspect(headers, label: "TEST")
+    IO.inspect(request, label: "TEST")
 
     if is_nil(rest) do
       %HTTPRequest{
