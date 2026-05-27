@@ -21,14 +21,19 @@ defmodule Server do
     request = decode_http_request(content)
 
     response =
-      if request.line.target == "/" do
-        """
-        HTTP/1.1 200 OK\r\n\r\n
-        """
-      else
-        """
-        HTTP/1.1 404 Not Found\r\n\r\n
-        """
+      case request.line.target do
+        "/" ->
+          """
+          HTTP/1.1 200 OK\r\n\r\n
+          """
+
+        "/echo/" ->
+          IO.puts("RIGHT")
+
+        _ ->
+          """
+          HTTP/1.1 404 Not Found\r\n\r\n
+          """
       end
 
     :gen_tcp.send(client, response)
