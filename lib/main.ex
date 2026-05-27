@@ -38,6 +38,7 @@ defmodule Server do
 
           "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: #{String.length(user_agent_value)}\r\n\r\n#{user_agent_value}"
 
+        _ ->
           """
           HTTP/1.1 404 Not Found\r\n\r\n
           """
