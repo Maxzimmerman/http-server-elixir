@@ -19,6 +19,7 @@ defmodule Server do
     {:ok, content} = :gen_tcp.recv(client, 0)
 
     request = decode_http_request(content)
+    IO.inspect(request, label: "TEST")
 
     response =
       case request.line.target do
