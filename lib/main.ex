@@ -22,13 +22,13 @@ defmodule Server do
     IO.inspect(request, label: "TEST")
 
     response =
-      case request.line.target do
-        "/" ->
+      case request do
+        %HTTPRequest{line: %{target: "/"}} ->
           """
           HTTP/1.1 200 OK\r\n\r\n
           """
 
-        "/echo/" <> str ->
+        %HTTPRequest{line: %{target: "/echo/" <> str}} ->
           "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: #{String.length(str)}\r\n\r\n#{str}"
 
         _ ->
