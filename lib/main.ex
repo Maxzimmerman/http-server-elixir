@@ -19,6 +19,7 @@ defmodule Server do
     {:ok, content} = :gen_tcp.recv(client, 0)
 
     request = decode_http_request(content)
+    IO.inspect(request)
 
     response =
       case request do
@@ -47,23 +48,12 @@ defmodule Server do
     [line | rest] = request_list
     {headers, [body]} = Enum.split(rest, -1)
     [method, target, version] = String.split(line, " ")
-    IO.inspect(request, label: "TEST")
-    IO.inspect(headers, label: "tst labels")
-    IO.inspect(body)
 
-    if is_nil(rest) do
-      %HTTPRequest{
-        line: %{method: method, target: target, version: version},
-        headers: headers,
-        body: rest
-      }
-    else
-      %HTTPRequest{
-        line: %{method: method, target: target, version: version},
-        headers: headers,
-        body: nil
-      }
-    end
+    %HTTPRequest{
+      line: %{method: method, target: target, version: version},
+      headers: headers,
+      body: body
+    }
   end
 
   def main(_args) do
