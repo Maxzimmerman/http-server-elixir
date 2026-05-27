@@ -36,6 +36,8 @@ defmodule Server do
           IO.puts(user_agent_value)
           IO.puts("RIGHT")
 
+          "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: #{String.length(user_agent_value)}\r\n\r\n#{user_agent_value}"
+
           """
           HTTP/1.1 404 Not Found\r\n\r\n
           """
