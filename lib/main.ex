@@ -31,10 +31,7 @@ defmodule Server do
           "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: #{String.length(str)}\r\n\r\n#{str}"
 
         %HTTPRequest{line: %{target: "/user-agent"}, headers: headers} ->
-          IO.inspect(headers)
           [_host, "User-Agent: " <> user_agent_value | _rest] = headers
-          IO.puts(user_agent_value)
-          IO.puts("RIGHT")
 
           "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: #{String.length(user_agent_value)}\r\n\r\n#{user_agent_value}"
 
