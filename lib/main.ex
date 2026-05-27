@@ -43,7 +43,9 @@ defmodule Server do
   end
 
   def decode_http_request(request) do
-    [line, headers | rest] = String.split(request, "\r\n")
+    request_list = String.split(request, "\r\n")
+    [line | rest] = request_list
+    {headers, [body]} = Enum.split(rest, -1)
     [method, target, version] = String.split(line, " ")
     IO.inspect(request, label: "TEST")
     IO.inspect(headers, label: "tst labels")
