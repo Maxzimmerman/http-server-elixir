@@ -27,7 +27,7 @@ defmodule Server do
           HTTP/1.1 200 OK\r\n\r\n
           """
 
-        "/echo/" ->
+        "/echo/" <> str ->
           IO.puts("RIGHT")
 
         _ ->
