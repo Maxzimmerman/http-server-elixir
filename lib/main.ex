@@ -49,6 +49,7 @@ defmodule Server do
     [method, target, version] = String.split(line, " ")
     IO.inspect(request, label: "TEST")
     IO.inspect(headers, label: "tst labels")
+    IO.inspect(body)
 
     if is_nil(rest) do
       %HTTPRequest{
