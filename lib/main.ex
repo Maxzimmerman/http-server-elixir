@@ -35,7 +35,7 @@ defmodule Server do
           Content-Type: text/plain\r\n
           Content-Length: #{String.length(str)}\r\n
 
-          #{str}
+          #{str}\r\n
           """
 
         _ ->
