@@ -42,6 +42,7 @@ defmodule Server do
   def decode_http_request(request) do
     [line, headers | rest] = String.split(request, "\r\n")
     [method, target, version] = String.split(line, " ")
+    IO.inspect(headers)
 
     if is_nil(rest) do
       %HTTPRequest{
