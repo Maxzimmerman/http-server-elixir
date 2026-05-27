@@ -9,13 +9,21 @@ defmodule Server do
     # You can use print statements as follows for debugging, they'll be visible when running tests.
     IO.puts("Logs from your program will appear here!")
 
-    # TODO: Uncomment the code below to pass the first stage
-    #
-    # # Since the tester restarts your program quite often, setting SO_REUSEADDR
-    # # ensures that we don't run into 'Address already in use' errors
     {:ok, socket} = :gen_tcp.listen(4221, [:binary, active: false, reuseaddr: true])
-    {:ok, client} = :gen_tcp.accept(socket)
+    listen_loop(socket)
+  end
 
+  def listen_loop(socket) do
+    case :gen_tcp.accept(socket) do
+      {:ok, client} ->
+        {:ok, pid} = Task.start(fn -> handle_client(client) end)
+        :gen_tcp.controlling_process(client, pid)
+    end
+
+    listen_loop(socket)
+  end
+
+  def handle_client(client) do
     {:ok, content} = :gen_tcp.recv(client, 0)
 
     request = decode_http_request(content)
