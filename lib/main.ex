@@ -19,7 +19,6 @@ defmodule Server do
     {:ok, content} = :gen_tcp.recv(client, 0)
 
     request = decode_http_request(content)
-    IO.inspect(request)
 
     response =
       case request do
@@ -31,10 +30,10 @@ defmodule Server do
         %HTTPRequest{line: %{target: "/echo/" <> str}} ->
           "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: #{String.length(str)}\r\n\r\n#{str}"
 
-        %HTTPRequest{line: %{target: "/user-agent"}} ->
+        %HTTPRequest{line: %{target: "/user-agent"}, headers: headers} ->
+          IO.inspect(headers)
           IO.puts("RIGHT")
 
-        _ ->
           """
           HTTP/1.1 404 Not Found\r\n\r\n
           """
