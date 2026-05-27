@@ -32,8 +32,8 @@ defmodule Server do
 
         %HTTPRequest{line: %{target: "/user-agent"}, headers: headers} ->
           IO.inspect(headers)
-          [_host, user_agent | _rest] = headers
-          IO.puts(user_agent)
+          [_host, "User-Agent" <> user_agent_value | _rest] = headers
+          IO.puts(user_agent_value)
           IO.puts("RIGHT")
 
           """
