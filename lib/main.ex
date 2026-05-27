@@ -32,8 +32,9 @@ defmodule Server do
           HTTP/1.1 200 OK
           \r\n
 
-          Content-Type: text/plain\r\n
+          Content-Type: text/plain
           Content-Length: #{String.length(str)}\r\n
+          \r\n
 
           #{str}
           """
