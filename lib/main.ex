@@ -48,14 +48,10 @@ defmodule Server do
     [line | rest] = request_list
     {headers, [body]} = Enum.split(rest, -1)
     [method, target, version] = String.split(line, " ")
-    IO.inspect(headers, label: "TEST")
 
     %HTTPRequest{
       line: %{method: method, target: target, version: version},
-      headers:
-        Enum.map(headers, fn header ->
-          Map.new(String.split(":"))
-        end),
+      headers: headers,
       body: body
     }
   end
