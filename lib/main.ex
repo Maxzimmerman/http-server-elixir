@@ -28,7 +28,12 @@ defmodule Server do
           """
 
         "/echo/" <> str ->
-          IO.puts("RIGHT")
+          """
+          HTTP/1.1 200 OK\r\n\r\n
+          Content-Type: text/plain\r\n
+          Content-Length: #{String.length(str)}\r\n      
+          \r\n
+          """
 
         _ ->
           """
