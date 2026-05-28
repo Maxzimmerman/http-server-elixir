@@ -44,7 +44,7 @@ defmodule Server do
 
           "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: #{String.length(user_agent_value)}\r\n\r\n#{user_agent_value}"
 
-        %HTTPRequest{line: %{target: "/files" <> path}, headers: headers} ->
+        %HTTPRequest{line: %{target: "/files" <> path}} ->
           ["--directory", dir] = System.argv()
 
           case File.read(Path.join(dir, path)) do
