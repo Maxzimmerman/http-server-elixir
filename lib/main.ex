@@ -55,12 +55,8 @@ defmodule Server do
 
               "HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: #{byte_size(binary)}\r\n\r\n#{binary}"
 
-            {:error, :enoent} ->
-              IO.puts(path)
-              IO.puts("not found")
-
             {:error, reason} ->
-              IO.inspect(reason)
+              "HTTP/1.1 404 Not Found\r\n\r\n"
           end
 
         _ ->
