@@ -49,7 +49,7 @@ defmodule Server do
           line: %{target: "/files" <> path},
           headers: [_, _, "Content-Type: application/octet-stream" | _]
         } ->
-          IO.puts("RIGHT")
+          "HTTP/1.1 201 Created\r\n\r\n"
 
         # File GET enpoint 
         %HTTPRequest{line: %{target: "/files" <> path}} ->
