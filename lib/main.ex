@@ -28,8 +28,6 @@ defmodule Server do
 
     request = decode_http_request(content)
     args = System.argv()
-    IO.inspect(args, label: "TEST ARGS")
-    IO.inspect(request, label: "TEST REQUEST")
 
     response =
       case request do
@@ -51,11 +49,9 @@ defmodule Server do
 
           case File.read(Path.join(dir, path)) do
             {:ok, binary} ->
-              IO.puts("there")
-
               "HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: #{byte_size(binary)}\r\n\r\n#{binary}"
 
-            {:error, reason} ->
+            {:error, _reason} ->
               "HTTP/1.1 404 Not Found\r\n\r\n"
           end
 
