@@ -52,19 +52,12 @@ defmodule Server do
               IO.puts("there")
 
             {:error, :enoent} ->
+              IO.puts(path)
               IO.puts("not found")
 
             {:error, reason} ->
               IO.inspect(reason)
           end
-
-          if length(args) > 1 do
-            IO.inspect(args, label: "THERE")
-          else
-            IO.puts("NOT")
-          end
-
-          IO.puts(path)
 
         _ ->
           """
