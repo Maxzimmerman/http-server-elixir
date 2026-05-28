@@ -53,6 +53,8 @@ defmodule Server do
             {:ok, stat} ->
               IO.puts("there")
 
+              "HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: #{stat.size}\r\n\r\nHello, World!"
+
             {:error, :enoent} ->
               IO.puts(path)
               IO.puts("not found")
