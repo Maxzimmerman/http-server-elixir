@@ -47,7 +47,7 @@ defmodule Server do
         # File POST endpoint
         %HTTPRequest{
           line: %{target: "/files" <> path},
-          headers: [_, _, "Cotent-Type: application/octet-stream"]
+          headers: [_, _, "Content-Type: application/octet-stream"]
         } ->
           IO.puts("RIGHT")
 
