@@ -27,7 +27,6 @@ defmodule Server do
     {:ok, content} = :gen_tcp.recv(client, 0)
 
     request = decode_http_request(content)
-    args = System.argv()
 
     response =
       case request do
