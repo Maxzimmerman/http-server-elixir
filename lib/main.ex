@@ -49,11 +49,11 @@ defmodule Server do
         %HTTPRequest{line: %{target: "/files" <> path}, headers: headers} ->
           ["--directory", dir] = System.argv()
 
-          case File.stat(Path.join(dir, path)) do
-            {:ok, stat} ->
+          case File.read(Path.join(dir, path)) do
+            {:ok, binary} ->
               IO.puts("there")
 
-              "HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: #{stat.size}\r\n\r\nHello, World!"
+              "HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: #{byte_size(binary)}\r\n\r\n#{binary}"
 
             {:error, :enoent} ->
               IO.puts(path)
