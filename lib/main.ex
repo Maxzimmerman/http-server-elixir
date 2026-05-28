@@ -47,7 +47,16 @@ defmodule Server do
           "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: #{String.length(user_agent_value)}\r\n\r\n#{user_agent_value}"
 
         %HTTPRequest{line: %{target: "/files" <> path}, headers: headers} ->
-          args = System.argv()
+          case File.stat(path) do
+            {:ok, stat} ->
+              IO.puts("there")
+
+            {:error, :enoent} ->
+              IO.puts("not found")
+
+            {:error, reason} ->
+              IO.inspect(reason)
+          end
 
           if length(args) > 1 do
             IO.inspect(args, label: "THERE")
