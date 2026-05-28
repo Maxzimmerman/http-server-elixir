@@ -47,9 +47,14 @@ defmodule Server do
         # File POST endpoint
         %HTTPRequest{
           line: %{target: "/files" <> path},
-          headers: [_, _, "Content-Type: application/octet-stream" | _]
+          headers: [_, _, "Content-Type: application/octet-stream" | _],
+          body: body
         } ->
-          "HTTP/1.1 201 Created\r\n\r\n"
+          ["--directory", dir] = System.argv()
+
+          case File.write(Path.join(dir, path), body) do
+            :ok -> "HTTP/1.1 201 Created\r\n\r\n"
+          end
 
         # File GET enpoint 
         %HTTPRequest{line: %{target: "/files" <> path}} ->
