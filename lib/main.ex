@@ -44,6 +44,7 @@ defmodule Server do
 
           "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: #{String.length(user_agent_value)}\r\n\r\n#{user_agent_value}"
 
+        # File GET enpoint 
         %HTTPRequest{line: %{target: "/files" <> path}} ->
           ["--directory", dir] = System.argv()
 
@@ -54,6 +55,13 @@ defmodule Server do
             {:error, _reason} ->
               "HTTP/1.1 404 Not Found\r\n\r\n"
           end
+
+        # File POST endpoint
+        %HTTPRequest{
+          line: %{target: "/files" <> path},
+          headers: [_, _, "Cotent-Type: application/octet-stream"]
+        } ->
+          IO.puts("RIGHT")
 
         _ ->
           """
