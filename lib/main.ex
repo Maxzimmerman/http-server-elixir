@@ -56,6 +56,7 @@ defmodule Server do
       |> Enum.filter(&Enum.member?(@allowed_encoding_types, &1))
 
     IO.inspect(matches, label: "TEST matches")
+    IO.inspect(Base.encode16(str), label: "TEST str")
 
     case length(matches) do
       1 ->
