@@ -43,6 +43,13 @@ defmodule Server do
     """
   end
 
+  defp handle_request(%HTTPRequest{line: %{target: "/echo/" <> str}, headers: headers}) do
+    [_host, "Accept-Encoding: " <> encoding | _rest] = headers
+    IO.inpsect(encoding, label: "TEST")
+
+    "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: #{String.length(str)}\r\n\r\n#{str}"
+  end
+
   defp handle_request(%HTTPRequest{line: %{target: "/echo/" <> str}}) do
     "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: #{String.length(str)}\r\n\r\n#{str}"
   end
