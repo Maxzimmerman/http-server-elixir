@@ -48,6 +48,8 @@ defmodule Server do
          headers: [_host, "Accept-Encoding: " <> encoding | _rest]
        }) do
     IO.inspect(encoding, label: "TEST")
+    matches = Enum.filter(String.split(encoding), &Enum.member?(@allowed_encoding_types, &1))
+    IO.inspect(matches, label: "TEST matches")
 
     if encoding in @allowed_encoding_types do
       "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: #{encoding}\r\nContent-Length: #{String.length(str)}\r\n\r\n#{str}"
