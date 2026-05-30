@@ -50,10 +50,10 @@ defmodule Server do
     IO.inspect(String.split(encoding, ","), label: "TEST")
 
     matches =
-      Enum.filter(
-        String.split(encoding, ","),
-        &Enum.member?(@allowed_encoding_types, String.strip(&1))
-      )
+      encoding
+      |> String.split(",")
+      |> Enum.map(&String.strip(&1))
+      |> Enum.filter(&Enum.member?(@allowed_encoding_types, &1))
 
     IO.inspect(matches, label: "TEST matches")
 
