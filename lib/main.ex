@@ -57,10 +57,14 @@ defmodule Server do
 
     IO.inspect(matches, label: "TEST matches")
 
-    if length(matches) >= 1 do
-      "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: #{encoding}\r\nContent-Length: #{String.length(str)}\r\n\r\n#{str}"
-    else
-      "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: #{String.length(str)}\r\n\r\n#{str}"
+    case length(matches) do
+      1 ->
+        [match | _] = matches
+
+        "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: #{match}\r\nContent-Length: #{String.length(str)}\r\n\r\n#{str}"
+
+      _ ->
+        "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: #{String.length(str)}\r\n\r\n#{str}"
     end
   end
 
