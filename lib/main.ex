@@ -64,7 +64,7 @@ defmodule Server do
         binary_packet = <<str::binary, 0::8>>
         IO.inspect(binary_packet)
 
-        "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: #{match}\r\nContent-Length: #{String.length(str)}\r\n\r\n#{Base.encode16(str)}"
+        "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: #{match}\r\nContent-Length: #{String.length(str)}\r\n\r\n#{Base.encode16(binary_packet)}"
 
       _ ->
         "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: #{String.length(str)}\r\n\r\n#{str}"
