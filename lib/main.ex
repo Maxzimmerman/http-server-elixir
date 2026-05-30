@@ -47,7 +47,7 @@ defmodule Server do
          line: %{target: "/echo/" <> str},
          headers: [_host, "Accept-Encoding: " <> encoding | _rest]
        }) do
-    IO.inspect(encoding, label: "TEST")
+    IO.inspect(String.split(encoding, ","), label: "TEST")
     matches = Enum.filter(String.split(encoding, ","), &Enum.member?(@allowed_encoding_types, &1))
     IO.inspect(matches, label: "TEST matches")
 
