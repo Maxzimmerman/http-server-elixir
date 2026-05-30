@@ -43,8 +43,10 @@ defmodule Server do
     """
   end
 
-  defp handle_request(%HTTPRequest{line: %{target: "/echo/" <> str}, headers: headers}) do
-    [_host, "Accept-Encoding: " <> encoding | _rest] = headers
+  defp handle_request(%HTTPRequest{
+         line: %{target: "/echo/" <> str},
+         headers: [_host, "Accept-Encoding: " <> encoding | _rest]
+       }) do
     IO.inspect(encoding, label: "TEST")
 
     if encoding in @allowed_encoding_types do
