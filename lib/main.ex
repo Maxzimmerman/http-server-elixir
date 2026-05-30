@@ -1,6 +1,10 @@
 defmodule Server do
   use Application
 
+  @allowed_encoding_types [
+    "gzip"
+  ]
+
   def start(_type, _args) do
     Supervisor.start_link([{Task, fn -> Server.listen() end}], strategy: :one_for_one)
   end
@@ -29,53 +33,56 @@ defmodule Server do
     request = decode_http_request(content)
     IO.inspect(request)
 
-    response =
-      case request do
-        %HTTPRequest{line: %{target: "/"}} ->
-          """
-          HTTP/1.1 200 OK\r\n\r\n
-          """
-
-        %HTTPRequest{line: %{target: "/echo/" <> str}} ->
-          "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: #{String.length(str)}\r\n\r\n#{str}"
-
-        %HTTPRequest{line: %{target: "/user-agent"}, headers: headers} ->
-          [_host, "User-Agent: " <> user_agent_value | _rest] = headers
-
-          "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: #{String.length(user_agent_value)}\r\n\r\n#{user_agent_value}"
-
-        # File POST endpoint
-        %HTTPRequest{
-          line: %{target: "/files" <> path},
-          headers: [_, _, "Content-Type: application/octet-stream" | _],
-          body: body
-        } ->
-          ["--directory", dir] = System.argv()
-
-          case File.write(Path.join(dir, path), body) do
-            :ok -> "HTTP/1.1 201 Created\r\n\r\n"
-          end
-
-        # File GET enpoint 
-        %HTTPRequest{line: %{target: "/files" <> path}} ->
-          ["--directory", dir] = System.argv()
-
-          case File.read(Path.join(dir, path)) do
-            {:ok, binary} ->
-              "HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: #{byte_size(binary)}\r\n\r\n#{binary}"
-
-            {:error, _reason} ->
-              "HTTP/1.1 404 Not Found\r\n\r\n"
-          end
-
-        _ ->
-          """
-          HTTP/1.1 404 Not Found\r\n\r\n
-          """
-      end
-
+    response = handle_request(request)
     :gen_tcp.send(client, response)
   end
+
+  defp handle_request(%HTTPRequest{line: %{target: "/"}}) do
+    """
+    HTTP/1.1 200 OK\r\n\r\n
+    """
+  end
+
+  defp handle_request(%HTTPRequest{line: %{target: "/echo/" <> str}}) do
+    "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: #{String.length(str)}\r\n\r\n#{str}"
+  end
+
+  defp handle_request(%HTTPRequest{line: %{target: "/user-agent"}, headers: headers}) do
+    [_host, "User-Agent: " <> user_agent_value | _rest] = headers
+
+    "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: #{String.length(user_agent_value)}\r\n\r\n#{user_agent_value}"
+  end
+
+  # File POST endpoint
+  defp handle_request(%HTTPRequest{
+         line: %{target: "/files" <> path},
+         headers: [_, _, "Content-Type: application/octet-stream" | _],
+         body: body
+       }) do
+    ["--directory", dir] = System.argv()
+
+    case File.write(Path.join(dir, path), body) do
+      :ok -> "HTTP/1.1 201 Created\r\n\r\n"
+    end
+  end
+
+  # File GET enpoint 
+  defp handle_request(%HTTPRequest{line: %{target: "/files" <> path}}) do
+    ["--directory", dir] = System.argv()
+
+    case File.read(Path.join(dir, path)) do
+      {:ok, binary} ->
+        "HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: #{byte_size(binary)}\r\n\r\n#{binary}"
+
+      {:error, _reason} ->
+        "HTTP/1.1 404 Not Found\r\n\r\n"
+    end
+  end
+
+  defp handle_request(_),
+    do: """
+    HTTP/1.1 404 Not Found\r\n\r\n
+    """
 
   def decode_http_request(request) do
     request_list = String.split(request, "\r\n")
