@@ -49,6 +49,8 @@ defmodule Server do
 
     if encoding in @allowed_encoding_types do
       "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: #{encoding}\r\nContent-Length: #{String.length(str)}\r\n\r\n#{str}"
+    else
+      "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: #{String.length(str)}\r\n\r\n#{str}"
     end
   end
 
