@@ -34,8 +34,13 @@ defmodule Server do
         IO.inspect(request)
 
         response = handle_request(request)
+
         :gen_tcp.send(client, response)
         handle_client(client)
+
+        if String.contains?(response, "Connection: close") do
+          :gen_tcp.close(client)
+        end
 
       {:error, :closed} ->
         :gen_tcp.close(client)
