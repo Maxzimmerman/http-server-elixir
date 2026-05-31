@@ -43,8 +43,10 @@ defmodule Server do
     end
   end
 
-  defp maybe_close_connection(%HTTPRequest{headers: [_, "Connection: close" | _]}, client),
-    do: :gen_tcp.close(client)
+  defp maybe_close_connection(%HTTPRequest{headers: [_, "Connection: close" | _]}, client) do
+    IO.puts("HIT RIGHT")
+    :gen_tcp.close(client)
+  end
 
   defp maybe_close_connection(_request, _client), do: nil
 
