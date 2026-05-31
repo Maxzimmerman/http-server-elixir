@@ -126,7 +126,7 @@ defmodule Server do
       Enum.reduce(headers, [], fn header, acc ->
         if String.contains?(header, "User-Agent") do
           "User-Agent: " <> user_agent_value = header
-          [acc | user_agent_value]
+          [user_agent_value | acc]
         end
       end)
 
