@@ -123,10 +123,10 @@ defmodule Server do
 
   defp handle_request(%HTTPRequest{line: %{target: "/user-agent"}, headers: headers}) do
     res =
-      Enum.filter(headers, fn header ->
+      Enum.reduce(headers, [], fn header, acc ->
         if String.contains?(header, "User-Agent") do
           "User-Agent: " <> user_agent_value = header
-          user_agent_value
+          [acc | user_agent_value]
         end
       end)
 
