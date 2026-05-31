@@ -35,6 +35,7 @@ defmodule Server do
 
     response = handle_request(request)
     :gen_tcp.send(client, response)
+    handle_client(client)
   end
 
   defp handle_request(%HTTPRequest{line: %{target: "/"}}) do
