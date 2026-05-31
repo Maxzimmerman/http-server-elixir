@@ -42,6 +42,12 @@ defmodule Server do
     end
   end
 
+  defp handle_request(%HTTPRequest{line: %{target: "/"}, close: true}) do
+    """
+    HTTP/1.1 200 OK\r\n"Connection: close"\r\n
+    """
+  end
+
   defp handle_request(%HTTPRequest{line: %{target: "/"}}) do
     """
     HTTP/1.1 200 OK\r\n\r\n
@@ -89,8 +95,6 @@ defmodule Server do
           user_agent_value
         end
       end)
-
-    IO.inspect(res)
 
     [_host, _, "User-Agent: " <> user_agent_value | _rest] = headers
 
