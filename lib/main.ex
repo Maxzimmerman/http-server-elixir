@@ -126,6 +126,8 @@ defmodule Server do
         end
       end)
 
+    IO.puts(res)
+
     [_host, _, "User-Agent: " <> user_agent_value | _rest] = headers
 
     "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: #{String.length(user_agent_value)}\r\n\r\n#{user_agent_value}"
