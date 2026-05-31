@@ -84,13 +84,13 @@ defmodule Server do
   defp handle_request(%HTTPRequest{line: %{target: "/user-agent"}, headers: headers}) do
     res =
       Enum.filter(headers, fn header ->
-        if String.contains?("User-Agent") do
+        if String.contains?(header, "User-Agent") do
           "User-Agent: " <> user_agent_value = header
           user_agent_value
         end
       end)
 
-    IO.inpsect(res)
+    IO.inspect(res)
 
     [_host, _, "User-Agent: " <> user_agent_value | _rest] = headers
 
