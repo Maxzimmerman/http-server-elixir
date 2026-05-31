@@ -31,6 +31,7 @@ defmodule Server do
     case :gen_tcp.recv(client, 0) do
       {:ok, content} ->
         request = decode_http_request(content)
+        maybe_close_connection(request, client)
         IO.inspect(request)
 
         response = handle_request(request)
@@ -41,6 +42,11 @@ defmodule Server do
         :gen_tcp.close(client)
     end
   end
+
+  defp maybe_close_connection(%HTTPRequest{headers: [_, "Connection: close" | _]}, client),
+    do: :gen_tcp.close(client)
+
+  defp maybe_close_connection(_request, _client), do: nil
 
   defp handle_request(%HTTPRequest{line: %{target: "/"}}) do
     """
