@@ -82,6 +82,14 @@ defmodule Server do
   end
 
   defp handle_request(%HTTPRequest{line: %{target: "/user-agent"}, headers: headers}) do
+    res =
+      Enum.filter(headers, fn header ->
+        "User-Agent: " <> user_agent_value = header
+        user_agent_value
+      end)
+
+    IO.inpsect(res)
+
     [_host, _, "User-Agent: " <> user_agent_value | _rest] = headers
 
     "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: #{String.length(user_agent_value)}\r\n\r\n#{user_agent_value}"
