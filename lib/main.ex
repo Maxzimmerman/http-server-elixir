@@ -51,7 +51,7 @@ defmodule Server do
 
   defp handle_request(%HTTPRequest{line: %{target: "/"}, close: true}) do
     """
-    HTTP/1.1 200 OK\r\nConnection: close\r\n
+    HTTP/1.1 200 OK\nConnection: close\r\n
     """
   end
 
