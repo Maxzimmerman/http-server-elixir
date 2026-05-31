@@ -52,7 +52,7 @@ defmodule Server do
     matches =
       encoding
       |> String.split(",")
-      |> Enum.map(&String.strip(&1))
+      |> Enum.map(&String.trim(&1))
       |> Enum.filter(&Enum.member?(@allowed_encoding_types, &1))
 
     IO.inspect(matches, label: "TEST matches")
