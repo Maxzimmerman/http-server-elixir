@@ -18,18 +18,13 @@ defmodule Server do
   end
 
   def listen_loop(socket) do
-    client =
-      case :gen_tcp.accept(socket) do
-        {:ok, client} ->
-          {:ok, pid} = Task.start(fn -> handle_client(client) end)
-          :gen_tcp.controlling_process(client, pid)
-          client
+    case :gen_tcp.accept(socket) do
+      {:ok, client} ->
+        {:ok, pid} = Task.start(fn -> handle_client(client) end)
+        :gen_tcp.controlling_process(client, pid)
+    end
 
-        _ ->
-          socket
-      end
-
-    listen_loop(client)
+    listen_loop(socket)
   end
 
   def handle_client(client) do
