@@ -31,7 +31,6 @@ defmodule Server do
     case :gen_tcp.recv(client, 0) do
       {:ok, content} ->
         request = decode_http_request(content)
-        request = maybe_close_connection(request)
         IO.inspect(request)
 
         response = handle_request(request)
@@ -133,9 +132,14 @@ defmodule Server do
     %HTTPRequest{
       line: %{method: method, target: target, version: version},
       headers: headers,
-      body: body
+      body: body,
+      close: maybe_close_connection(headers)
     }
   end
+
+  defp maybe_close_connection([_, "Connection: close" | _]), do: true
+
+  defp maybe_close_connection(request), do: false
 
   def main(_args) do
     {:ok, _pid} = Application.ensure_all_started(:codecrafters_http_server)
