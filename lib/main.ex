@@ -28,14 +28,18 @@ defmodule Server do
   end
 
   def handle_client(client) do
-    {:ok, content} = :gen_tcp.recv(client, 0)
+    case :gen_tcp.recv(client, 0) do
+      {:ok, content} ->
+        request = decode_http_request(content)
+        IO.inspect(request)
 
-    request = decode_http_request(content)
-    IO.inspect(request)
+        response = handle_request(request)
+        :gen_tcp.send(client, response)
+        handle_client(client)
 
-    response = handle_request(request)
-    :gen_tcp.send(client, response)
-    handle_client(client)
+      {:error, :closed} ->
+        :gen_tcp.close(client)
+    end
   end
 
   defp handle_request(%HTTPRequest{line: %{target: "/"}}) do
