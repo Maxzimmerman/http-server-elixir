@@ -130,8 +130,6 @@ defmodule Server do
         else
           acc
         end
-
-        acc
       end)
 
     IO.inspect(res, label: "RES")
