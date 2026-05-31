@@ -127,6 +127,8 @@ defmodule Server do
         if String.contains?(header, "User-Agent") do
           "User-Agent: " <> user_agent_value = header
           acc <> user_agent_value
+        else
+          acc
         end
 
         acc
