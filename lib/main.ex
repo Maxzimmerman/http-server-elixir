@@ -132,7 +132,7 @@ defmodule Server do
         end
       end)
 
-    IO.puts(res)
+    IO.inspect(res, label: "RES")
 
     [_host, _, "User-Agent: " <> user_agent_value | _rest] = headers
 
