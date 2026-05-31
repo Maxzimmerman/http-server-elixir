@@ -42,11 +42,6 @@ defmodule Server do
     end
   end
 
-  defp maybe_close_connection(%HTTPRequest{headers: [_, "Connection: close" | _]} = request),
-    do: Map.put(request, :close, true)
-
-  defp maybe_close_connection(request), do: Map.put(request, :close, false)
-
   defp handle_request(%HTTPRequest{line: %{target: "/"}}) do
     """
     HTTP/1.1 200 OK\r\n\r\n
