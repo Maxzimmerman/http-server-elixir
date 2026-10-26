@@ -20,10 +20,10 @@ defmodule Client do
   def handle_client(client) do
     case :gen_tcp.recv(client, 0) do
       {:ok, content} ->
-        request = Application.decode_http_request(content)
+        request = Server.decode_http_request(content)
         IO.inspect(request)
 
-        response = Application.handle_request(request)
+        response = Server.handle_request(request)
 
         IO.inspect(response, label: "TEST response")
 
