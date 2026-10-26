@@ -19,10 +19,12 @@ defmodule Controllers.EchoController do
         body_size = byte_size(compressed_body)
         IO.inspect(compressed_body)
 
-        "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: #{match}\r\nContent-Length: #{body_size}\r\nConnection: close\r\n#{compressed_body}"
+        {:ok,
+         "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: #{match}\r\nContent-Length: #{body_size}\r\nConnection: close\r\n#{compressed_body}"}
 
       _ ->
-        "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: #{String.length(str)}\r\nConnection: close\r\n#{str}"
+        {:ok,
+         "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: #{String.length(str)}\r\nConnection: close\r\n#{str}"}
     end
   end
 
@@ -43,14 +45,17 @@ defmodule Controllers.EchoController do
         body_size = byte_size(compressed_body)
         IO.inspect(compressed_body)
 
-        "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: #{match}\r\nContent-Length: #{body_size}\r\n\r\n#{compressed_body}"
+        {:ok,
+         "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: #{match}\r\nContent-Length: #{body_size}\r\n\r\n#{compressed_body}"}
 
       _ ->
-        "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: #{String.length(str)}\r\n\r\n#{str}"
+        {:ok,
+         "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: #{String.length(str)}\r\n\r\n#{str}"}
     end
   end
 
   def handle_request(%HTTPRequest{line: %{target: "/echo/" <> str}}) do
-    "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: #{String.length(str)}\r\n\r\n#{str}"
+    {:ok,
+     "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: #{String.length(str)}\r\n\r\n#{str}"}
   end
 end
