@@ -12,7 +12,8 @@ defmodule Controllers.UserAgentController do
         end
       end)
 
-    "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: #{String.length(res)}\r\nConnection: close\r\n\r\n#{res}"
+    {:ok,
+     "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: #{String.length(res)}\r\nConnection: close\r\n\r\n#{res}"}
   end
 
   def handle_request(%HTTPRequest{line: %{target: "/user-agent"}, headers: headers}) do
@@ -26,6 +27,7 @@ defmodule Controllers.UserAgentController do
         end
       end)
 
-    "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: #{String.length(res)}\r\n\r\n#{res}"
+    {:ok,
+     "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: #{String.length(res)}\r\n\r\n#{res}"}
   end
 end
