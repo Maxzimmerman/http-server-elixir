@@ -6,7 +6,7 @@ defmodule Server do
   ]
 
   def start(_type, _args) do
-    Supervisor.start_link([{Task, fn -> Server.listen() end}], strategy: :one_for_one)
+    Supervisor.start_link([{Task, fn -> Client.listen() end}], strategy: :one_for_one)
   end
 
   def handle_request(%HTTPRequest{line: %{target: "/"}, close: true}) do
@@ -155,7 +155,7 @@ defmodule Server do
 
   defp maybe_close_connection([_, "Connection: close" | _]), do: true
 
-  defp maybe_close_connection(request), do: false
+  defp maybe_close_connection(_request), do: false
 
   def main(_args) do
     {:ok, _pid} = Application.ensure_all_started(:codecrafters_http_server)
