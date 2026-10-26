@@ -25,7 +25,7 @@ defmodule Orchestrator do
          HTTP/1.1 404 Not Found\r\n\r\n
          """}
 
-      controller ->
+      {:ok, controller} ->
         IO.inspect(endpoint(target))
         {:ok, controller}
     end
