@@ -9,60 +9,19 @@ defmodule Server do
     Supervisor.start_link([{Task, fn -> Server.listen() end}], strategy: :one_for_one)
   end
 
-  def listen() do
-    # You can use print statements as follows for debugging, they'll be visible when running tests.
-    IO.puts("Logs from your program will appear here!")
-
-    {:ok, socket} = :gen_tcp.listen(4221, [:binary, active: false, reuseaddr: true])
-    listen_loop(socket)
-  end
-
-  def listen_loop(socket) do
-    case :gen_tcp.accept(socket) do
-      {:ok, client} ->
-        {:ok, pid} = Task.start(fn -> handle_client(client) end)
-        :gen_tcp.controlling_process(client, pid)
-    end
-
-    listen_loop(socket)
-  end
-
-  def handle_client(client) do
-    case :gen_tcp.recv(client, 0) do
-      {:ok, content} ->
-        request = decode_http_request(content)
-        IO.inspect(request)
-
-        response = handle_request(request)
-
-        IO.inspect(response, label: "TEST response")
-
-        :gen_tcp.send(client, response)
-
-        if String.contains?(response, "Connection: close") do
-          :gen_tcp.close(client)
-        else
-          handle_client(client)
-        end
-
-      {:error, :closed} ->
-        :gen_tcp.close(client)
-    end
-  end
-
-  defp handle_request(%HTTPRequest{line: %{target: "/"}, close: true}) do
+  def handle_request(%HTTPRequest{line: %{target: "/"}, close: true}) do
     "HTTP/1.1 200 OK\r\nConnection: close\r\n\r\n"
   end
 
-  defp handle_request(%HTTPRequest{line: %{target: "/"}}) do
+  def handle_request(%HTTPRequest{line: %{target: "/"}}) do
     "HTTP/1.1 200 OK\r\n\r\n"
   end
 
-  defp handle_request(%HTTPRequest{
-         line: %{target: "/echo/" <> str},
-         headers: [_host, "Accept-Encoding: " <> encoding | _rest],
-         close: true
-       }) do
+  def handle_request(%HTTPRequest{
+        line: %{target: "/echo/" <> str},
+        headers: [_host, "Accept-Encoding: " <> encoding | _rest],
+        close: true
+      }) do
     IO.inspect(String.split(encoding, ","), label: "TEST")
 
     matches =
@@ -88,10 +47,10 @@ defmodule Server do
     end
   end
 
-  defp handle_request(%HTTPRequest{
-         line: %{target: "/echo/" <> str},
-         headers: [_host, "Accept-Encoding: " <> encoding | _rest]
-       }) do
+  def handle_request(%HTTPRequest{
+        line: %{target: "/echo/" <> str},
+        headers: [_host, "Accept-Encoding: " <> encoding | _rest]
+      }) do
     IO.inspect(String.split(encoding, ","), label: "TEST")
 
     matches =
