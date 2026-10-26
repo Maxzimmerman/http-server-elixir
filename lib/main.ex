@@ -22,16 +22,11 @@ defmodule Server do
         headers: [_host, "Accept-Encoding: " <> encoding | _rest],
         close: true
       }) do
-    IO.inspect(String.split(encoding, ","), label: "TEST")
-
     matches =
       encoding
       |> String.split(",")
       |> Enum.map(&String.trim(&1))
       |> Enum.filter(&Enum.member?(@allowed_encoding_types, &1))
-
-    IO.inspect(matches, label: "TEST matches")
-    IO.inspect(Base.encode16(str), label: "TEST str")
 
     case length(matches) do
       1 ->
@@ -51,16 +46,11 @@ defmodule Server do
         line: %{target: "/echo/" <> str},
         headers: [_host, "Accept-Encoding: " <> encoding | _rest]
       }) do
-    IO.inspect(String.split(encoding, ","), label: "TEST")
-
     matches =
       encoding
       |> String.split(",")
       |> Enum.map(&String.trim(&1))
       |> Enum.filter(&Enum.member?(@allowed_encoding_types, &1))
-
-    IO.inspect(matches, label: "TEST matches")
-    IO.inspect(Base.encode16(str), label: "TEST str")
 
     case length(matches) do
       1 ->
