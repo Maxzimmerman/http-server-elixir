@@ -32,7 +32,7 @@ defmodule Orchestrator do
   end
 
   defp endpoint(target) do
-    [endpoint, _] = String.split(target, "/")
+    [endpoint | _] = String.split(target, "/")
     endpoint
   end
 end
