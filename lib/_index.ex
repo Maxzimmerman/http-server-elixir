@@ -2,9 +2,9 @@ defmodule Orchestrator do
   alias Controllers
   # Controller => Taget map
   @controllers %{
-    MainController => "/",
-    EchoController => "/echo",
-    Controllers.FileController => "/files"
+    "/" => MainController,
+    "/echo" => EchoController,
+    "/files" => Controllers.FileController
   }
 
   def deligate_request(%HTTPRequest{line: %{target: target}} = request) do
