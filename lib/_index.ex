@@ -32,7 +32,7 @@ defmodule Orchestrator do
   end
 
   defp endpoint(target) do
-    IO.inspect(String.split(target, "/"))
-    Enum.at(0, String.split(target, "/"))
+    [endpoint, _] = String.split(target, "/")
+    endpoint
   end
 end
