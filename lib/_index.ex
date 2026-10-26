@@ -3,7 +3,7 @@ defmodule Orchestrator do
   # Controller => Taget map
   @controllers %{
     MainController => "/",
-    EchoController => "/echo/",
+    EchoController => "/echo",
     Controllers.FileController => "/files"
   }
 
@@ -33,7 +33,7 @@ defmodule Orchestrator do
 
   def endpoint(path) do
     case String.split(path, "/", trim: true) do
-      [first | _rest] -> first
+      [first | _rest] -> first <> "/"
       [] -> "/"
     end
   end
