@@ -24,16 +24,20 @@ defmodule Client do
 
         IO.inspect(response, label: "TEST response")
 
-        :gen_tcp.send(client, response)
+        maybe_close_connection(client, response)
 
-        if String.contains?(response, "Connection: close") do
-          :gen_tcp.close(client)
-        else
-          handle_client(client)
-        end
+        :gen_tcp.send(client, response)
 
       {:error, :closed} ->
         :gen_tcp.close(client)
+    end
+  end
+
+  defp maybe_close_connection(client, response) do
+    if String.contains?(response, "Connection: close") do
+      :gen_tcp.close(client)
+    else
+      handle_client(client)
     end
   end
 end
