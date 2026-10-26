@@ -9,14 +9,6 @@ defmodule Server do
     Supervisor.start_link([{Task, fn -> Client.listen() end}], strategy: :one_for_one)
   end
 
-  def handle_request(%HTTPRequest{line: %{target: "/"}, close: true}) do
-    "HTTP/1.1 200 OK\r\nConnection: close\r\n\r\n"
-  end
-
-  def handle_request(%HTTPRequest{line: %{target: "/"}}) do
-    "HTTP/1.1 200 OK\r\n\r\n"
-  end
-
   def handle_request(%HTTPRequest{
         line: %{target: "/echo/" <> str},
         headers: [_host, "Accept-Encoding: " <> encoding | _rest],
