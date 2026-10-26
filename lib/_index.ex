@@ -1,6 +1,11 @@
 defmodule Orchestrator do
+  alias Controllers
   # Controller => Taget map
-  @controllers %{Controllers.MainController => "/", Controllers.EchoController => "/echo/"}
+  @controllers %{
+    MainController => "/",
+    EchoController => "/echo/",
+    FileController => "/files"
+  }
 
   def deligate_request(%HTTPRequest{line: %{target: target}} = request) do
     with {:ok, controller} <- controller(target) do
