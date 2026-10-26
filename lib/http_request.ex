@@ -8,4 +8,10 @@ defmodule HTTPRequest do
           body: String.t(),
           close: boolean()
         }
+
+  @allowed_encoding_types [
+    "gzip"
+  ]
+
+  def allowed_encoding_types, do: @allowed_encoding_types
 end
