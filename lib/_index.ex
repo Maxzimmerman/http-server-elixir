@@ -26,7 +26,12 @@ defmodule Orchestrator do
         IO.inspect(controller)
         IO.puts(target)
         IO.inspect(Map.fetch(@controllers, target))
+        IO.inspect(endpoint(target))
         {:ok, controller}
     end
+  end
+
+  defp endpoint(target) do
+    Enum.at(0, String.split(target, "/"))
   end
 end
