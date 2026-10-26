@@ -4,7 +4,7 @@ defmodule Orchestrator do
   @controllers %{
     MainController => "/",
     EchoController => "/echo/",
-    FileController => "/files"
+    Controllers.FileController => "/files"
   }
 
   def deligate_request(%HTTPRequest{line: %{target: target}} = request) do
