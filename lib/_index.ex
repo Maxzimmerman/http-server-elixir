@@ -31,8 +31,10 @@ defmodule Orchestrator do
     end
   end
 
-  defp endpoint(target) do
-    [endpoint | _] = String.split(target, "/")
-    endpoint
+  def endpoint(path) do
+    case String.split(path, "/", trim: true) do
+      [first | _rest] -> first
+      [] -> "/"
+    end
   end
 end
