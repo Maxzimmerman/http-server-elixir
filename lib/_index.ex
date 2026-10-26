@@ -22,6 +22,7 @@ defmodule Orchestrator do
          """}
 
       controller ->
+        IO.inspect(controller)
         {:ok, controller}
     end
   end
