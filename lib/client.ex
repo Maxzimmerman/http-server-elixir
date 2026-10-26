@@ -20,7 +20,7 @@ defmodule Client do
         request = HTTPRequest.decode_http_request(content)
         IO.inspect(request)
 
-        response = Orchestrator.deligate_request(request)
+        response = get_response(request)
 
         IO.inspect(response, label: "TEST response")
 
@@ -38,6 +38,13 @@ defmodule Client do
       :gen_tcp.close(client)
     else
       handle_client(client)
+    end
+  end
+
+  defp get_response(request) do
+    case Orchestrator.deligate_request(request) do
+      {:ok, response} -> response
+      {:error, error_response} -> error_response
     end
   end
 end
