@@ -76,11 +76,11 @@ defmodule Server do
     end
   end
 
-  defp handle_request(%HTTPRequest{line: %{target: "/echo/" <> str}}) do
+  def handle_request(%HTTPRequest{line: %{target: "/echo/" <> str}}) do
     "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: #{String.length(str)}\r\n\r\n#{str}"
   end
 
-  defp handle_request(%HTTPRequest{line: %{target: "/user-agent"}, headers: headers, close: true}) do
+  def handle_request(%HTTPRequest{line: %{target: "/user-agent"}, headers: headers, close: true}) do
     res =
       Enum.reduce(headers, "", fn header, acc ->
         if String.contains?(header, "User-Agent") do
@@ -94,7 +94,7 @@ defmodule Server do
     "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: #{String.length(res)}\r\nConnection: close\r\n\r\n#{res}"
   end
 
-  defp handle_request(%HTTPRequest{line: %{target: "/user-agent"}, headers: headers}) do
+  def handle_request(%HTTPRequest{line: %{target: "/user-agent"}, headers: headers}) do
     res =
       Enum.reduce(headers, "", fn header, acc ->
         if String.contains?(header, "User-Agent") do
@@ -109,11 +109,11 @@ defmodule Server do
   end
 
   # File POST endpoint
-  defp handle_request(%HTTPRequest{
-         line: %{target: "/files" <> path},
-         headers: [_, _, "Content-Type: application/octet-stream" | _],
-         body: body
-       }) do
+  def handle_request(%HTTPRequest{
+        line: %{target: "/files" <> path},
+        headers: [_, _, "Content-Type: application/octet-stream" | _],
+        body: body
+      }) do
     ["--directory", dir] = System.argv()
 
     case File.write(Path.join(dir, path), body) do
@@ -122,7 +122,7 @@ defmodule Server do
   end
 
   # File GET enpoint 
-  defp handle_request(%HTTPRequest{line: %{target: "/files" <> path}}) do
+  def handle_request(%HTTPRequest{line: %{target: "/files" <> path}}) do
     ["--directory", dir] = System.argv()
 
     case File.read(Path.join(dir, path)) do
@@ -134,7 +134,7 @@ defmodule Server do
     end
   end
 
-  defp handle_request(_),
+  def handle_request(_),
     do: """
     HTTP/1.1 404 Not Found\r\n\r\n
     """
