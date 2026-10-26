@@ -10,7 +10,8 @@ defmodule Orchestrator do
   def deligate_request(%HTTPRequest{line: %{target: target}} = request) do
     with {:ok, controller} <- controller(target) do
       IO.inspect(request)
-      controller.handle_request(request)
+      {:ok, response} = controller.handle_request(request)
+      response
     end
   end
 
