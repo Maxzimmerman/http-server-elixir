@@ -15,7 +15,7 @@ defmodule Orchestrator do
 
   defp controller(target) do
     case Map.fetch(@controllers, endpoint(target)) do
-      [] ->
+      :error ->
         {:error,
          """
          HTTP/1.1 404 Not Found\r\n\r\n
