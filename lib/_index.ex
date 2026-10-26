@@ -24,6 +24,7 @@ defmodule Orchestrator do
       controller ->
         IO.inspect(@controllers)
         IO.inspect(controller)
+        IO.inspect(Map.fetch(@controllers, target))
         {:ok, controller}
     end
   end
