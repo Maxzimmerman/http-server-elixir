@@ -4,7 +4,8 @@ defmodule Orchestrator do
   @controllers %{
     "/" => MainController,
     "/echo" => EchoController,
-    "/files" => Controllers.FileController
+    "/files" => FileController,
+    "/user-agent" => UserAgentController
   }
 
   def deligate_request(%HTTPRequest{line: %{target: target}} = request) do
