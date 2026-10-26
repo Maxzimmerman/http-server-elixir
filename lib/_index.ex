@@ -14,7 +14,7 @@ defmodule Orchestrator do
   end
 
   defp controller(target) do
-    case Map.get(@controllers, target) do
+    case Map.fetch(@controllers, endpoint(target)) do
       [] ->
         {:error,
          """
