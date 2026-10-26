@@ -10,6 +10,7 @@ defmodule Orchestrator do
 
   def deligate_request(%HTTPRequest{line: %{target: target}} = request) do
     with {:ok, controller} <- controller(target) do
+      IO.inspect(request)
       controller.handle_request(request)
     end
   end
@@ -32,7 +33,7 @@ defmodule Orchestrator do
 
   def endpoint(path) do
     case String.split(path, "/", trim: true) do
-      [first | _rest] -> first <> "/"
+      [first | _rest] -> "/" <> first
       [] -> "/"
     end
   end
