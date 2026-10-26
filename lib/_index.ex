@@ -16,16 +16,14 @@ defmodule Orchestrator do
   defp controller(target) do
     case Map.fetch(@controllers, endpoint(target)) do
       :error ->
+        IO.inspect(endpoint(target))
+
         {:error,
          """
          HTTP/1.1 404 Not Found\r\n\r\n
          """}
 
       controller ->
-        IO.inspect(@controllers)
-        IO.inspect(controller)
-        IO.puts(target)
-        IO.inspect(Map.fetch(@controllers, target))
         IO.inspect(endpoint(target))
         {:ok, controller}
     end
