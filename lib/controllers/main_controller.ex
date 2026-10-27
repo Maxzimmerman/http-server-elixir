@@ -7,6 +7,6 @@ defmodule Controllers.MainController do
   end
 
   def handle_request(%HTTPRequest{line: %{target: "/"}}) do
-    {:ok, "HTTP/1.1 200 OK\r\n\r\n"}
+    {:ok, HTTPRequest.ok()}
   end
 end
