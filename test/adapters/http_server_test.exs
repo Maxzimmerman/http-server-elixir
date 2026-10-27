@@ -128,6 +128,20 @@ defmodule Adapters.HTTPServerTest do
     assert {:error, :closed} = :gen_tcp.recv(socket, 0, @recv_timeout)
   end
 
+  test "drops a connection that closes mid-request without crashing the server" do
+    socket = connect()
+    # A partial request with no header terminator, then an abrupt close: the
+    # worker's next recv fails and it should just close its side quietly.
+    :ok = :gen_tcp.send(socket, "GET / HTTP/1.1\r\nHost: x")
+    :ok = :gen_tcp.close(socket)
+
+    # The listener survives: a fresh connection is still served.
+    next = connect()
+    :ok = :gen_tcp.send(next, "GET / HTTP/1.1\r\nHost: x\r\n\r\n")
+    assert {"HTTP/1.1 200 OK", _headers, ""} = recv_response(next)
+    :gen_tcp.close(next)
+  end
+
   test "responds 400 to a malformed request line" do
     socket = connect()
     :ok = :gen_tcp.send(socket, "NONSENSE\r\n\r\n")
