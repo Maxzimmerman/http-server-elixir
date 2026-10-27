@@ -1,6 +1,7 @@
 defmodule Controllers.UserAgentController do
   @behaviour ControllerDefinition
 
+  @impl true
   def handle_request(%HTTPRequest{line: %{target: "/user-agent"}, headers: headers, close: true}) do
     res =
       Enum.reduce(headers, "", fn header, acc ->

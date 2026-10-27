@@ -13,6 +13,10 @@ defmodule HTTPRequest do
     "gzip"
   ]
 
+  def ok, do: "HTTP/1.1 200 OK\r\n\r\n"
+  def created, do: "HTTP/1.1 201 Created\r\n\r\n"
+  def not_found, do: "HTTP/1.1 404 Not Found\r\n\r\n"
+
   def allowed_encoding_types, do: @allowed_encoding_types
 
   def decode_http_request(request) do

@@ -1,6 +1,7 @@
 defmodule Controllers.EchoController do
   @behaviour ControllerDefinition
 
+  @impl true
   def handle_request(%HTTPRequest{
         line: %{target: "/echo/" <> str},
         headers: [_host, "Accept-Encoding: " <> encoding | _rest],
