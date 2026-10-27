@@ -1,4 +1,4 @@
-defmodule Controllers.FileController do
+defmodule Controllers.FilesController do
   @behaviour ControllerDefinition
 
   alias Protocol.{HTTPRequest, HTTPResponse}

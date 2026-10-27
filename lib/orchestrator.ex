@@ -5,7 +5,7 @@ defmodule Orchestrator do
   @controllers %{
     "/" => Controllers.MainController,
     "/echo" => Controllers.EchoController,
-    "/files" => Controllers.FileController,
+    "/files" => Controllers.FilesController,
     "/user-agent" => Controllers.UserAgentController
   }
 
