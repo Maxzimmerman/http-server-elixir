@@ -20,11 +20,8 @@ defmodule Client do
     case :gen_tcp.recv(client, 0) do
       {:ok, content} ->
         request = HTTPRequest.decode_http_request(content)
-        IO.inspect(request)
 
         response = get_response(request)
-
-        IO.inspect(response, label: "TEST response")
 
         :gen_tcp.send(client, response)
 
@@ -47,7 +44,6 @@ defmodule Client do
     case Orchestrator.deligate_request(request) do
       {:ok, response} -> response
       {:error, error_response} -> error_response
-      response -> IO.inspect(response)
     end
   end
 end
