@@ -23,7 +23,7 @@ defmodule Controllers.FileController do
         {:ok, "HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: #{byte_size(binary)}\r\n\r\n#{binary}"}
 
       {:error, _reason} ->
-        %{:ok, "HTTP/1.1 404 Not Found\r\n\r\n"}
+        {:ok, "HTTP/1.1 404 Not Found\r\n\r\n"}
     end
   end
 end
