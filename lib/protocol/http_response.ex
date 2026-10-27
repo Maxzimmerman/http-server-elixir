@@ -1,29 +1,61 @@
 defmodule Protocol.HTTPResponse do
   @moduledoc """
-  Owns HTTP response serialization: status lines, header framing and the CRLF
-  rules. Controllers describe a response (status, headers, body); this module is
-  the only place that knows how it is spelled on the wire.
+  Owns everything about how a response looks on the wire: status lines, header
+  names, content types, content negotiation/compression, `Content-Length` and
+  the CRLF framing. Controllers describe a response by intent — a status and a
+  few semantic options — and never spell a protocol literal themselves.
+
+  Options for `build/2`:
+
+    * `:body`         - the response body (default `""`)
+    * `:content_type` - `:text` or `:octet_stream`
+    * `:encodings`    - encodings the client will accept; the best supported one
+                        is applied to the body
+    * `:close`        - `true` to send `Connection: close`
   """
 
   @type status :: :ok | :created | :not_found
-  @type header :: {String.t(), String.t() | integer()}
 
-  @spec build(status(), [header()], iodata()) :: binary()
-  def build(status, headers \\ [], body \\ "") do
-    lines = [status_line(status) | render_headers(with_content_length(headers, body))]
+  @content_types %{
+    text: "text/plain",
+    octet_stream: "application/octet-stream"
+  }
+
+  @supported_encodings ["gzip"]
+
+  @spec build(status(), keyword()) :: binary()
+  def build(status, opts \\ []) do
+    {body, encoding_headers} =
+      negotiate_encoding(Keyword.get(opts, :body, ""), Keyword.get(opts, :encodings, []))
+
+    headers =
+      content_type_header(opts[:content_type]) ++
+        encoding_headers ++
+        connection_header(opts[:close]) ++
+        content_length_header(body)
+
+    lines = [status_line(status) | render_headers(headers)]
 
     IO.iodata_to_binary([Enum.join(lines, "\r\n"), "\r\n\r\n", body])
   end
 
-  @doc "Header list carrying `Connection: close` when the request asked to close."
-  @spec connection_header(boolean()) :: [header()]
-  def connection_header(true), do: [{"Connection", "close"}]
-  def connection_header(_), do: []
+  defp negotiate_encoding(body, requested) do
+    case Enum.find(requested, &(&1 in @supported_encodings)) do
+      "gzip" -> {:zlib.gzip(body), [{"Content-Encoding", "gzip"}]}
+      nil -> {body, []}
+    end
+  end
 
-  defp with_content_length(headers, body) do
+  defp content_type_header(nil), do: []
+  defp content_type_header(type), do: [{"Content-Type", Map.fetch!(@content_types, type)}]
+
+  defp connection_header(true), do: [{"Connection", "close"}]
+  defp connection_header(_), do: []
+
+  defp content_length_header(body) do
     case IO.iodata_length(body) do
-      0 -> headers
-      length -> headers ++ [{"Content-Length", length}]
+      0 -> []
+      length -> [{"Content-Length", length}]
     end
   end
 
