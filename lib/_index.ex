@@ -1,4 +1,6 @@
 defmodule Orchestrator do
+  alias Protocol.{HTTPRequest, HTTPResponse}
+
   # Controller => Taget map
   @controllers %{
     "/" => Controllers.MainController,
@@ -19,11 +21,7 @@ defmodule Orchestrator do
     case Map.fetch(@controllers, endpoint(target)) do
       :error ->
         IO.inspect(endpoint(target))
-
-        {:error,
-         """
-         HTTP/1.1 404 Not Found\r\n\r\n
-         """}
+        {:error, HTTPResponse.build(:not_found)}
 
       {:ok, controller} ->
         IO.inspect(endpoint(target))

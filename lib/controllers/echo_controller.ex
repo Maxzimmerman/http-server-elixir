@@ -1,62 +1,42 @@
 defmodule Controllers.EchoController do
   @behaviour ControllerDefinition
 
+  alias Protocol.{HTTPRequest, HTTPResponse}
+
   @impl true
-  def handle_request(%HTTPRequest{
-        line: %{target: "/echo/" <> str},
-        headers: [_host, "Accept-Encoding: " <> encoding | _rest],
-        close: true
-      }) do
-    matches =
-      encoding
+  def handle_request(%HTTPRequest{line: %{target: "/echo/" <> str}, headers: headers, close: close}) do
+    base = [{"Content-Type", "text/plain"} | HTTPResponse.connection_header(close)]
+
+    response =
+      case gzip_encoding(headers) do
+        {:ok, encoding} ->
+          HTTPResponse.build(:ok, base ++ [{"Content-Encoding", encoding}], :zlib.gzip(str))
+
+        :none ->
+          HTTPResponse.build(:ok, base, str)
+      end
+
+    {:ok, response}
+  end
+
+  defp gzip_encoding(headers) do
+    supported =
+      headers
+      |> accept_encoding()
       |> String.split(",")
-      |> Enum.map(&String.trim(&1))
-      |> Enum.filter(&Enum.member?(HTTPRequest.allowed_encoding_types(), &1))
+      |> Enum.map(&String.trim/1)
+      |> Enum.filter(&(&1 in HTTPRequest.allowed_encoding_types()))
 
-    case length(matches) do
-      1 ->
-        [match | _] = matches
-        compressed_body = :zlib.gzip(str)
-        body_size = byte_size(compressed_body)
-        IO.inspect(compressed_body)
-
-        {:ok,
-         "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: #{match}\r\nContent-Length: #{body_size}\r\nConnection: close\r\n#{compressed_body}"}
-
-      _ ->
-        {:ok,
-         "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: #{String.length(str)}\r\nConnection: close\r\n#{str}"}
+    case supported do
+      [encoding | _] -> {:ok, encoding}
+      [] -> :none
     end
   end
 
-  def handle_request(%HTTPRequest{
-        line: %{target: "/echo/" <> str},
-        headers: [_host, "Accept-Encoding: " <> encoding | _rest]
-      }) do
-    matches =
-      encoding
-      |> String.split(",")
-      |> Enum.map(&String.trim(&1))
-      |> Enum.filter(&Enum.member?(HTTPRequest.allowed_encoding_types(), &1))
-
-    case length(matches) do
-      1 ->
-        [match | _] = matches
-        compressed_body = :zlib.gzip(str)
-        body_size = byte_size(compressed_body)
-        IO.inspect(compressed_body)
-
-        {:ok,
-         "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: #{match}\r\nContent-Length: #{body_size}\r\n\r\n#{compressed_body}"}
-
-      _ ->
-        {:ok,
-         "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: #{String.length(str)}\r\n\r\n#{str}"}
-    end
-  end
-
-  def handle_request(%HTTPRequest{line: %{target: "/echo/" <> str}}) do
-    {:ok,
-     "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: #{String.length(str)}\r\n\r\n#{str}"}
+  defp accept_encoding(headers) do
+    Enum.find_value(headers, "", fn
+      "Accept-Encoding: " <> value -> value
+      _ -> false
+    end)
   end
 end

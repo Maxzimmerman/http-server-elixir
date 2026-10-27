@@ -1,12 +1,10 @@
 defmodule Controllers.MainController do
   @behaviour ControllerDefinition
 
-  @impl true
-  def handle_request(%HTTPRequest{line: %{target: "/"}, close: true}) do
-    {:ok, "HTTP/1.1 200 OK\r\nConnection: close\r\n\r\n"}
-  end
+  alias Protocol.{HTTPRequest, HTTPResponse}
 
-  def handle_request(%HTTPRequest{line: %{target: "/"}}) do
-    {:ok, HTTPRequest.ok()}
+  @impl true
+  def handle_request(%HTTPRequest{line: %{target: "/"}, close: close}) do
+    {:ok, HTTPResponse.build(:ok, HTTPResponse.connection_header(close))}
   end
 end

@@ -1,33 +1,20 @@
 defmodule Controllers.UserAgentController do
   @behaviour ControllerDefinition
 
-  @impl true
-  def handle_request(%HTTPRequest{line: %{target: "/user-agent"}, headers: headers, close: true}) do
-    res =
-      Enum.reduce(headers, "", fn header, acc ->
-        if String.contains?(header, "User-Agent") do
-          "User-Agent: " <> user_agent_value = header
-          acc <> user_agent_value
-        else
-          acc
-        end
-      end)
+  alias Protocol.{HTTPRequest, HTTPResponse}
 
-    {:ok,
-     "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: #{String.length(res)}\r\nConnection: close\r\n\r\n#{res}"}
+  @impl true
+  def handle_request(%HTTPRequest{line: %{target: "/user-agent"}, headers: headers, close: close}) do
+    body = user_agent(headers)
+    headers = [{"Content-Type", "text/plain"} | HTTPResponse.connection_header(close)]
+
+    {:ok, HTTPResponse.build(:ok, headers, body)}
   end
 
-  def handle_request(%HTTPRequest{line: %{target: "/user-agent"}, headers: headers}) do
-    res =
-      Enum.reduce(headers, "", fn header, acc ->
-        if String.contains?(header, "User-Agent") do
-          "User-Agent: " <> user_agent_value = header
-          acc <> user_agent_value
-        else
-          acc
-        end
-      end)
-
-    {:ok, HTTPRequest.success_with_plain_text_response(res)}
+  defp user_agent(headers) do
+    Enum.find_value(headers, "", fn
+      "User-Agent: " <> value -> value
+      _ -> false
+    end)
   end
 end

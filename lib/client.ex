@@ -1,4 +1,6 @@
 defmodule Client do
+  alias Protocol.HTTPRequest
+
   def listen() do
     {:ok, socket} = :gen_tcp.listen(4221, [:binary, active: false, reuseaddr: true])
     listen_loop(socket)
