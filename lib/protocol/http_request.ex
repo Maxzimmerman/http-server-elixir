@@ -2,9 +2,11 @@ defmodule Protocol.HTTPRequest do
   @enforce_keys [:line, :headers]
   defstruct [:line, :headers, :body, :close]
 
+  @type request_line :: %{method: String.t(), target: String.t(), version: String.t()}
+
   @type t :: %__MODULE__{
-          line: map(),
-          headers: list(),
+          line: request_line(),
+          headers: [String.t()],
           body: String.t(),
           close: boolean()
         }
@@ -44,7 +46,10 @@ defmodule Protocol.HTTPRequest do
     end)
   end
 
-  defp maybe_close_connection([_, "Connection: close" | _]), do: true
-
-  defp maybe_close_connection(_request), do: false
+  defp maybe_close_connection(headers) do
+    case header_value(headers, "Connection") do
+      nil -> false
+      value -> String.downcase(String.trim(value)) == "close"
+    end
+  end
 end

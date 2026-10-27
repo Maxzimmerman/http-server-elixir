@@ -25,23 +25,18 @@ defmodule Client do
 
         :gen_tcp.send(client, response)
 
-        maybe_close_connection(client, response)
+        maybe_close_connection(client, request.close)
 
       {:error, :closed} ->
         :gen_tcp.close(client)
     end
   end
 
-  defp maybe_close_connection(client, response) do
-    if String.contains?(response, "Connection: close") do
-      :gen_tcp.close(client)
-    else
-      handle_client(client)
-    end
-  end
+  defp maybe_close_connection(client, true), do: :gen_tcp.close(client)
+  defp maybe_close_connection(client, _close), do: handle_client(client)
 
   defp get_response(request) do
-    case Orchestrator.deligate_request(request) do
+    case Orchestrator.delegate_request(request) do
       {:ok, response} -> response
       {:error, error_response} -> error_response
     end

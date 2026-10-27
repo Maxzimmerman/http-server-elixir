@@ -7,6 +7,13 @@ defmodule Server do
 
   def main(_args) do
     {:ok, _pid} = Application.ensure_all_started(:codecrafters_http_server)
+    configure_directory(System.argv())
     Process.sleep(:infinity)
   end
+
+  defp configure_directory(["--directory", dir]) do
+    Application.put_env(:codecrafters_http_server, :directory, dir)
+  end
+
+  defp configure_directory(_argv), do: :ok
 end

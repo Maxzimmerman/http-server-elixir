@@ -7,4 +7,6 @@ defmodule Controllers.UserAgentController do
   def handle_request(%HTTPRequest{line: %{target: "/user-agent"}, close: close} = request) do
     {:ok, HTTPResponse.build(:ok, content_type: :text, body: HTTPRequest.user_agent(request), close: close)}
   end
+
+  def handle_request(_request), do: {:error, HTTPResponse.build(:not_found)}
 end

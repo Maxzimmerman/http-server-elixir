@@ -1,7 +1,7 @@
 defmodule Orchestrator do
   alias Protocol.{HTTPRequest, HTTPResponse}
 
-  # Controller => Taget map
+  # Controller => Target map
   @controllers %{
     "/" => Controllers.MainController,
     "/echo" => Controllers.EchoController,
@@ -9,7 +9,7 @@ defmodule Orchestrator do
     "/user-agent" => Controllers.UserAgentController
   }
 
-  def deligate_request(%HTTPRequest{line: %{target: target}} = request) do
+  def delegate_request(%HTTPRequest{line: %{target: target}} = request) do
     with {:ok, controller} <- controller(target) do
       controller.handle_request(request)
     end
@@ -25,7 +25,7 @@ defmodule Orchestrator do
     end
   end
 
-  def endpoint(path) do
+  defp endpoint(path) do
     case String.split(path, "/", trim: true) do
       [first | _rest] -> "/" <> first
       [] -> "/"
