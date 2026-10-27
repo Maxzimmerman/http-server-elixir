@@ -1,5 +1,5 @@
 defmodule Controllers.MainController do
-  @behaviour ControllerDefinition
+  use ControllerDefinition
 
   alias Protocol.{HTTPRequest, HTTPResponse}
 
@@ -7,6 +7,4 @@ defmodule Controllers.MainController do
   def handle_request(%HTTPRequest{line: %{target: "/"}, close: close}) do
     {:ok, HTTPResponse.build(:ok, close: close)}
   end
-
-  def handle_request(_request), do: {:error, HTTPResponse.build(:not_found)}
 end

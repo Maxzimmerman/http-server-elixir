@@ -1,5 +1,5 @@
 defmodule Controllers.EchoController do
-  @behaviour ControllerDefinition
+  use ControllerDefinition
 
   alias Protocol.{HTTPRequest, HTTPResponse}
 
@@ -13,6 +13,4 @@ defmodule Controllers.EchoController do
        close: close
      )}
   end
-
-  def handle_request(_request), do: {:error, HTTPResponse.build(:not_found)}
 end

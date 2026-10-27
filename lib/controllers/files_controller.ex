@@ -1,7 +1,9 @@
 defmodule Controllers.FilesController do
-  @behaviour ControllerDefinition
+  use ControllerDefinition
 
   alias Protocol.{HTTPRequest, HTTPResponse}
+
+  defp directory, do: Application.get_env(:codecrafters_http_server, :directory, ".")
 
   @impl true
   def handle_request(%HTTPRequest{line: %{method: "POST", target: "/files" <> path}, body: body}) do
@@ -20,8 +22,4 @@ defmodule Controllers.FilesController do
         {:ok, HTTPResponse.build(:not_found)}
     end
   end
-
-  def handle_request(_request), do: {:error, HTTPResponse.build(:not_found)}
-
-  defp directory, do: Application.get_env(:codecrafters_http_server, :directory, ".")
 end
