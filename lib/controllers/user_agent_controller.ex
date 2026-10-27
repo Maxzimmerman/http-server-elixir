@@ -28,7 +28,6 @@ defmodule Controllers.UserAgentController do
         end
       end)
 
-    {:ok,
-     "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: #{String.length(res)}\r\n\r\n#{res}"}
+    {:ok, HTTPRequest.success_with_plain_text_response(res)}
   end
 end
