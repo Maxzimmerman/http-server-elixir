@@ -6,6 +6,8 @@ defmodule Adapters.HTTPServer do
   `Protocol` and `Orchestrator` layers.
   """
 
+  require Logger
+
   alias Protocol.{HTTPRequest, HTTPResponse}
 
   def listen() do
@@ -43,7 +45,9 @@ defmodule Adapters.HTTPServer do
   defp handle_client(client, buffer) do
     case read_request(client, buffer) do
       {:ok, request, rest} ->
-        :gen_tcp.send(client, response_for(request))
+        {micros, response} = :timer.tc(fn -> response_for(request) end)
+        :gen_tcp.send(client, response)
+        log_served(request, response, micros)
 
         if request.close do
           :gen_tcp.close(client)
@@ -52,7 +56,9 @@ defmodule Adapters.HTTPServer do
         end
 
       {:error, :bad_request} ->
-        :gen_tcp.send(client, HTTPResponse.build(:bad_request))
+        response = HTTPResponse.build(:bad_request)
+        :gen_tcp.send(client, response)
+        Logger.info("- - #{HTTPResponse.status_code(response)} (malformed request)")
         :gen_tcp.close(client)
 
       {:error, _reason} ->
@@ -71,6 +77,15 @@ defmodule Adapters.HTTPServer do
       result ->
         result
     end
+  end
+
+  # One access-log line per served request: method, target, the status we sent,
+  # the response size on the wire, and how long building the response took.
+  defp log_served(%HTTPRequest{line: %{method: method, target: target}}, response, micros) do
+    Logger.info(
+      "#{method} #{target} #{HTTPResponse.status_code(response)} " <>
+        "#{byte_size(response)}B #{Float.round(micros / 1000, 1)}ms"
+    )
   end
 
   defp response_for(request) do

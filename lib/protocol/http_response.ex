@@ -39,6 +39,15 @@ defmodule Protocol.HTTPResponse do
     IO.iodata_to_binary([Enum.join(lines, "\r\n"), "\r\n\r\n", body])
   end
 
+  @doc """
+  The numeric status code carried by a built response, as a string (e.g.
+  `"200"`). Lets the caller report what it sent without re-deciding the status
+  or reaching into the wire format itself — every response we build starts with
+  `HTTP/1.1 <code> ...`.
+  """
+  @spec status_code(binary()) :: String.t()
+  def status_code(<<"HTTP/1.1 ", code::binary-size(3), _rest::binary>>), do: code
+
   defp negotiate_encoding(body, requested) do
     case Enum.find(requested, &(&1 in @supported_encodings)) do
       "gzip" -> {:zlib.gzip(body), [{"Content-Encoding", "gzip"}]}
