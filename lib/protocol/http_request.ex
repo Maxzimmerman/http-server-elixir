@@ -11,18 +11,52 @@ defmodule Protocol.HTTPRequest do
           close: boolean()
         }
 
-  def decode_http_request(request) do
-    request_list = String.split(request, "\r\n")
-    [line | rest] = request_list
-    {headers, [body]} = Enum.split(rest, -1)
-    [method, target, version] = String.split(line, " ")
+  @doc """
+  Parses a raw request into an `HTTPRequest`.
 
-    %__MODULE__{
-      line: %{method: method, target: target, version: version},
-      headers: headers,
-      body: body,
-      close: maybe_close_connection(headers)
-    }
+  Returns `{:error, :bad_request}` for anything that isn't a well-formed
+  request line followed by a blank-line-terminated header block. The body is
+  taken from the bytes after that blank line, truncated to `Content-Length`
+  when the header is present.
+  """
+  @spec decode_http_request(binary()) :: {:ok, t()} | {:error, :bad_request}
+  def decode_http_request(request) do
+    with [head, body] <- :binary.split(request, "\r\n\r\n"),
+         [request_line | headers] <- String.split(head, "\r\n"),
+         {:ok, line} <- parse_request_line(request_line) do
+      {:ok,
+       %__MODULE__{
+         line: line,
+         headers: headers,
+         body: take_body(body, headers),
+         close: maybe_close_connection(headers)
+       }}
+    else
+      _ -> {:error, :bad_request}
+    end
+  end
+
+  defp parse_request_line(line) do
+    case String.split(line, " ") do
+      [method, target, version] -> {:ok, %{method: method, target: target, version: version}}
+      _ -> :error
+    end
+  end
+
+  defp take_body(body, headers) do
+    case content_length(headers) do
+      nil -> body
+      length -> binary_part(body, 0, min(length, byte_size(body)))
+    end
+  end
+
+  defp content_length(headers) do
+    with value when is_binary(value) <- header_value(headers, "Content-Length"),
+         {length, ""} <- Integer.parse(String.trim(value)) do
+      length
+    else
+      _ -> nil
+    end
   end
 
   @doc "The `User-Agent` header value, or `\"\"` when absent."

@@ -1,5 +1,5 @@
 defmodule Client do
-  alias Protocol.HTTPRequest
+  alias Protocol.{HTTPRequest, HTTPResponse}
 
   def listen() do
     {:ok, socket} = :gen_tcp.listen(4221, [:binary, active: false, reuseaddr: true])
@@ -19,13 +19,15 @@ defmodule Client do
   def handle_client(client) do
     case :gen_tcp.recv(client, 0) do
       {:ok, content} ->
-        request = HTTPRequest.decode_http_request(content)
+        case HTTPRequest.decode_http_request(content) do
+          {:ok, request} ->
+            :gen_tcp.send(client, get_response(request))
+            maybe_close_connection(client, request.close)
 
-        response = get_response(request)
-
-        :gen_tcp.send(client, response)
-
-        maybe_close_connection(client, request.close)
+          {:error, :bad_request} ->
+            :gen_tcp.send(client, HTTPResponse.build(:bad_request))
+            :gen_tcp.close(client)
+        end
 
       {:error, :closed} ->
         :gen_tcp.close(client)

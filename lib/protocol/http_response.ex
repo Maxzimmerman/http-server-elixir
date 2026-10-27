@@ -14,7 +14,7 @@ defmodule Protocol.HTTPResponse do
     * `:close`        - `true` to send `Connection: close`
   """
 
-  @type status :: :ok | :created | :not_found
+  @type status :: :ok | :created | :not_found | :bad_request
 
   @content_types %{
     text: "text/plain",
@@ -66,4 +66,5 @@ defmodule Protocol.HTTPResponse do
   defp status_line(:ok), do: "HTTP/1.1 200 OK"
   defp status_line(:created), do: "HTTP/1.1 201 Created"
   defp status_line(:not_found), do: "HTTP/1.1 404 Not Found"
+  defp status_line(:bad_request), do: "HTTP/1.1 400 Bad Request"
 end
