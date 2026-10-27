@@ -5,6 +5,6 @@ defmodule Controllers.MainController do
 
   @impl true
   def handle_request(%HTTPRequest{line: %{target: "/"}, close: close}) do
-    {:ok, HTTPResponse.build(:ok, HTTPResponse.connection_header(close))}
+    {:ok, HTTPResponse.build(:ok, close: close)}
   end
 end
