@@ -45,6 +45,7 @@ defmodule Client do
     case Orchestrator.deligate_request(request) do
       {:ok, response} -> response
       {:error, error_response} -> error_response
+      response -> IO.inspect(response)
     end
   end
 end
