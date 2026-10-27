@@ -1,4 +1,11 @@
-defmodule Client do
+defmodule Adapters.HTTPServer do
+  @moduledoc """
+  Inbound adapter: binds the listening socket, accepts connections and drives
+  each one's request/response (and keep-alive) cycle. This is the system's
+  entry point — bytes from the outside world arrive here and are handed to the
+  `Protocol` and `Orchestrator` layers.
+  """
+
   alias Protocol.{HTTPRequest, HTTPResponse}
 
   def listen() do

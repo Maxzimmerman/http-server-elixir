@@ -2,7 +2,9 @@ defmodule Server do
   use Application
 
   def start(_type, _args) do
-    Supervisor.start_link([{Task, fn -> Client.listen() end}], strategy: :one_for_one)
+    Supervisor.start_link([{Task, fn -> Adapters.HTTPServer.listen() end}],
+      strategy: :one_for_one
+    )
   end
 
   def main(_args) do
