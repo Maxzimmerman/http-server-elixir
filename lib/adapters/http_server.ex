@@ -13,7 +13,7 @@ defmodule Adapters.HTTPServer do
     listen_loop(socket)
   end
 
-  def listen_loop(socket) do
+  defp listen_loop(socket) do
     case :gen_tcp.accept(socket) do
       {:ok, client} ->
         {:ok, pid} = Task.start(fn -> handle_client(client) end)
@@ -23,7 +23,7 @@ defmodule Adapters.HTTPServer do
     listen_loop(socket)
   end
 
-  def handle_client(client) do
+  defp handle_client(client) do
     case :gen_tcp.recv(client, 0) do
       {:ok, content} ->
         case HTTPRequest.decode_http_request(content) do
