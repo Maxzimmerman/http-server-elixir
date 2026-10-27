@@ -1,6 +1,0 @@
-
-22:01:04.364 [info] GET /echo/hello 200 69B 3.3ms
-
-22:01:04.376 [info] GET /user-agent 200 73B 0.7ms
-
-22:01:04.386 [info] GET /nope 404 26B 0.0ms
