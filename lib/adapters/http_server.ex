@@ -16,33 +16,62 @@ defmodule Adapters.HTTPServer do
   defp listen_loop(socket) do
     case :gen_tcp.accept(socket) do
       {:ok, client} ->
-        {:ok, pid} = Task.start(fn -> handle_client(client) end)
-        :gen_tcp.controlling_process(client, pid)
-    end
+        # Spawn the worker, hand it the socket, and only then let it start.
+        # `controlling_process/2` must be called by the current owner (us), and
+        # the worker must not touch the socket until it owns it — otherwise its
+        # `recv` could race the transfer. The `:serve` handshake enforces that.
+        {:ok, pid} = Task.start(fn -> await_socket(client) end)
+        :ok = :gen_tcp.controlling_process(client, pid)
+        send(pid, :serve)
+        listen_loop(socket)
 
-    listen_loop(socket)
+      {:error, reason} ->
+        # The listen socket is gone or unusable; stop accepting rather than
+        # crash the acceptor in a tight loop. The supervisor owns recovery.
+        {:error, reason}
+    end
   end
 
-  defp handle_client(client) do
-    case :gen_tcp.recv(client, 0) do
-      {:ok, content} ->
-        case HTTPRequest.decode_http_request(content) do
-          {:ok, request} ->
-            :gen_tcp.send(client, get_response(request))
-            maybe_close_connection(client, request.close)
+  defp await_socket(client) do
+    receive do
+      :serve -> handle_client(client, "")
+    end
+  end
 
-          {:error, :bad_request} ->
-            :gen_tcp.send(client, HTTPResponse.build(:bad_request))
-            :gen_tcp.close(client)
+  # Reads until a full request is buffered, serves it, and — on keep-alive —
+  # carries any leftover bytes into the next request.
+  defp handle_client(client, buffer) do
+    case read_request(client, buffer) do
+      {:ok, request, rest} ->
+        :gen_tcp.send(client, get_response(request))
+
+        if request.close do
+          :gen_tcp.close(client)
+        else
+          handle_client(client, rest)
         end
 
-      {:error, :closed} ->
+      {:error, :bad_request} ->
+        :gen_tcp.send(client, HTTPResponse.build(:bad_request))
+        :gen_tcp.close(client)
+
+      {:error, _reason} ->
         :gen_tcp.close(client)
     end
   end
 
-  defp maybe_close_connection(client, true), do: :gen_tcp.close(client)
-  defp maybe_close_connection(client, _close), do: handle_client(client)
+  defp read_request(client, buffer) do
+    case HTTPRequest.decode_http_request(buffer) do
+      {:error, :incomplete} ->
+        case :gen_tcp.recv(client, 0) do
+          {:ok, data} -> read_request(client, buffer <> data)
+          {:error, reason} -> {:error, reason}
+        end
+
+      result ->
+        result
+    end
+  end
 
   defp get_response(request) do
     case Orchestrator.delegate_request(request) do
