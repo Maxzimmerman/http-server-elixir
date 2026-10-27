@@ -43,7 +43,7 @@ defmodule Adapters.HTTPServer do
   defp handle_client(client, buffer) do
     case read_request(client, buffer) do
       {:ok, request, rest} ->
-        :gen_tcp.send(client, get_response(request))
+        :gen_tcp.send(client, response_for(request))
 
         if request.close do
           :gen_tcp.close(client)
@@ -73,7 +73,7 @@ defmodule Adapters.HTTPServer do
     end
   end
 
-  defp get_response(request) do
+  defp response_for(request) do
     case Orchestrator.delegate_request(request) do
       {:ok, response} -> response
       {:error, error_response} -> error_response

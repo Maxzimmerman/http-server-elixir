@@ -1,27 +1,28 @@
 defmodule Orchestrator do
   alias Protocol.{HTTPRequest, HTTPResponse}
 
-  # Controller => Target map
-  @controllers %{
-    "/" => Controllers.MainController,
-    "/echo" => Controllers.EchoController,
-    "/files" => Controllers.FilesController,
-    "/user-agent" => Controllers.UserAgentController
+  # The single source of routing: `{method, endpoint} => {controller, action}`.
+  # Both the method and the path segment are matched here, so a controller never
+  # re-decides which request it handles — it only builds a response for the
+  # action it was handed. Any method/path not in this table is a 404.
+  @routes %{
+    {"GET", "/"} => {Controllers.MainController, :index},
+    {"GET", "/echo"} => {Controllers.EchoController, :echo},
+    {"GET", "/user-agent"} => {Controllers.UserAgentController, :show},
+    {"GET", "/files"} => {Controllers.FilesController, :read},
+    {"POST", "/files"} => {Controllers.FilesController, :write}
   }
 
-  def delegate_request(%HTTPRequest{line: %{target: target}} = request) do
-    with {:ok, controller} <- controller(target) do
-      controller.handle_request(request)
+  def delegate_request(%HTTPRequest{line: %{method: method, target: target}} = request) do
+    with {:ok, {controller, action}} <- route(method, target) do
+      apply(controller, action, [request])
     end
   end
 
-  defp controller(target) do
-    case Map.fetch(@controllers, endpoint(target)) do
-      :error ->
-        {:error, HTTPResponse.build(:not_found)}
-
-      {:ok, controller} ->
-        {:ok, controller}
+  defp route(method, target) do
+    case Map.fetch(@routes, {method, endpoint(target)}) do
+      {:ok, action} -> {:ok, action}
+      :error -> {:error, HTTPResponse.build(:not_found)}
     end
   end
 
