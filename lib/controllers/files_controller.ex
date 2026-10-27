@@ -3,13 +3,8 @@ defmodule Controllers.FileController do
 
   alias Protocol.{HTTPRequest, HTTPResponse}
 
-  # File POST endpoint
   @impl true
-  def handle_request(%HTTPRequest{
-        line: %{target: "/files" <> path},
-        headers: [_, _, "Content-Type: application/octet-stream" | _],
-        body: body
-      }) do
+  def handle_request(%HTTPRequest{line: %{method: "POST", target: "/files" <> path}, body: body}) do
     ["--directory", dir] = System.argv()
 
     case File.write(Path.join(dir, path), body) do
@@ -17,13 +12,12 @@ defmodule Controllers.FileController do
     end
   end
 
-  # File GET endpoint
-  def handle_request(%HTTPRequest{line: %{target: "/files" <> path}}) do
+  def handle_request(%HTTPRequest{line: %{method: "GET", target: "/files" <> path}}) do
     ["--directory", dir] = System.argv()
 
     case File.read(Path.join(dir, path)) do
       {:ok, binary} ->
-        {:ok, HTTPResponse.build(:ok, [{"Content-Type", "application/octet-stream"}], binary)}
+        {:ok, HTTPResponse.build(:ok, content_type: :octet_stream, body: binary)}
 
       {:error, _reason} ->
         {:ok, HTTPResponse.build(:not_found)}
