@@ -24,9 +24,9 @@ defmodule Client do
 
         IO.inspect(response, label: "TEST response")
 
-        maybe_close_connection(client, response)
-
         :gen_tcp.send(client, response)
+
+        maybe_close_connection(client, response)
 
       {:error, :closed} ->
         :gen_tcp.close(client)
