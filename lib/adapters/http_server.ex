@@ -12,7 +12,7 @@ defmodule Adapters.HTTPServer do
 
   def listen() do
     # 1. Read the port from the environment, fallback to a default if missing, and convert to integer
-    port_env = System.get_env("PORT") || "8080"
+    port_env = System.get_env("PORT")
     {port, _} = Integer.parse(port_env)
     IO.inspect(port_env)
 
