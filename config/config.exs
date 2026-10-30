@@ -1,8 +1,18 @@
 import Config
 
-# Credentials: ex_aws resolves these lazily at runtime, so {:system, ...}
-# works even inside an escript. Set the env vars (e.g. via .envrc) at runtime.
+# Dummy credentials — Floci (LocalStack-style) accepts anything, but ex_aws
+# still requires them to be present or it errors before making the request.
 config :ex_aws,
-  access_key_id:     [{:system, "AWS_ACCESS_KEY_ID"}, :instance_role],
-  secret_access_key: [{:system, "AWS_SECRET_ACCESS_KEY"}, :instance_role],
-  region: "ap-southeast-1"
+  access_key_id: "test",
+  secret_access_key: "test",
+  region: "us-east-1"
+
+# Point the S3 client at the local Floci endpoint instead of real AWS.
+# scheme/host/port override the endpoint and give path-style URLs
+# (http://localhost:4566/<bucket>/...), which is what Floci expects.
+# `:bucket` is read by S3Storage.bucket/0 (lib/adapters/s3_storage.ex:9).
+config :ex_aws, :s3,
+  scheme: "http://",
+  host: "localhost",
+  port: 4566,
+  bucket: "http-server-bucket"
