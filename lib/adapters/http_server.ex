@@ -14,6 +14,7 @@ defmodule Adapters.HTTPServer do
     # 1. Read the port from the environment, fallback to a default if missing, and convert to integer
     port_env = System.get_env("PORT") || "8080"
     {port, _} = Integer.parse(port_env)
+    IO.inspect(port_env)
 
     # 2. Open the socket listening on all interfaces (0.0.0.0)
     {:ok, listen_socket} =
