@@ -1,3 +1,5 @@
+import Config
+
 # config.exs
 config :ex_aws, :s3,
   scheme: "http://",
