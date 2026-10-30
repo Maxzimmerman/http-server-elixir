@@ -35,3 +35,47 @@ Note: This section is for stages 2 and beyond.
    `lib/main.ex`.
 1. Run `codecrafters submit` to submit your solution to CodeCrafters. Test
    output will be streamed to your terminal.
+
+# Running it yourself
+
+`codecrafters submit` runs the test suite against your server on CodeCrafters'
+infrastructure. To hit the endpoints yourself, run the server locally and make
+requests with `curl` (or any HTTP client).
+
+Start the server (listens on port `4221`):
+
+```sh
+./your_program.sh
+```
+
+The `/files` endpoint reads and writes from a directory passed via the
+`--directory` flag (defaults to the current directory if omitted):
+
+```sh
+./your_program.sh --directory /tmp/
+```
+
+Then, from another terminal:
+
+```sh
+# Echo endpoint — responds with the path segment as the body
+curl -v http://localhost:4221/echo/hello
+
+# User-Agent endpoint — responds with the User-Agent header value
+curl -v -H "User-Agent: foobar/1.2.3" http://localhost:4221/user-agent
+
+# Files endpoint (GET) — reads a file from --directory
+echo -n "file contents here" > /tmp/foo.txt
+curl -v http://localhost:4221/files/foo.txt
+
+# Files endpoint (POST) — writes a file into --directory
+curl -v --data "12345" -H "Content-Type: application/octet-stream" \
+  http://localhost:4221/files/newfile.txt
+
+# Connection: close — the server echoes a `Connection: close` response header
+# and closes the connection after responding
+curl -v -H "Connection: close" http://localhost:4221/echo/hello
+```
+
+Use `curl -v` to inspect the status line and headers (`Content-Type`,
+`Content-Length`, etc.), which is what most stages are tested on.
