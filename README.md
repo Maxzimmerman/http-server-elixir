@@ -79,3 +79,8 @@ curl -v -H "Connection: close" http://localhost:4221/echo/hello
 
 Use `curl -v` to inspect the status line and headers (`Content-Type`,
 `Content-Length`, etc.), which is what most stages are tested on.
+
+curl -v --data "12345" \
+  -H "Connection: close" \
+  -H "Content-Type: application/octet-stream" \
+  http://localhost:4000/files/newfile.txt
