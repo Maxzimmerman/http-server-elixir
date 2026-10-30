@@ -10,7 +10,8 @@ defmodule Orchestrator do
     {"GET", "/echo"} => {Controllers.EchoController, :echo},
     {"GET", "/user-agent"} => {Controllers.UserAgentController, :show},
     {"GET", "/files"} => {Controllers.FilesController, :read},
-    {"POST", "/files"} => {Controllers.FilesController, :write}
+    {"POST", "/files"} => {Controllers.FilesController, :write},
+    {"GET", "/health"} => {Controllers.HealthController, :index}
   }
 
   def delegate_request(%HTTPRequest{line: %{method: method, target: target}} = request) do
