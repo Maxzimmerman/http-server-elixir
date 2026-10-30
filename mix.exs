@@ -27,7 +27,8 @@ defmodule App.MixProject do
       {:ex_aws, "~> 2.5"},
       {:ex_aws_s3, "~> 2.0"},
       {:poison, "~> 3.0"},
-      {:hackney, "~> 1.9"}
+      {:hackney, "~> 1.9"},
+      {:sweet_xml, "~> 0.7"}
       # {:dep_from_hexpm, "~> 0.3.0"},
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
     ]
