@@ -11,15 +11,8 @@ defmodule Adapters.HTTPServer do
   alias Protocol.{HTTPRequest, HTTPResponse}
 
   def listen() do
-    # 1. Read the port from the environment, fallback to the CodeCrafters
-    #    default (4221) if missing, and convert to integer. CodeCrafters does
-    #    not set PORT, so the default is what the tester connects to.
-    port_env = System.get_env("PORT") || "4221"
-    {port, _} = Integer.parse(port_env)
-
-    # 2. Open the socket listening on all interfaces (0.0.0.0)
     {:ok, listen_socket} =
-      :gen_tcp.listen(port, [
+      :gen_tcp.listen(port_config(), [
         :binary,
         packet: :line,
         active: false,
@@ -108,5 +101,11 @@ defmodule Adapters.HTTPServer do
       {:ok, response} -> response
       {:error, error_response} -> error_response
     end
+  end
+
+  defp port_config() do
+    port_env = System.get_env("PORT") || "4221"
+    {port, _} = Integer.parse(port_env)
+    port
   end
 end
