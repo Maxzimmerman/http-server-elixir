@@ -14,7 +14,7 @@ defmodule Adapters.HTTPServer do
     {:ok, listen_socket} =
       :gen_tcp.listen(port_config(), [
         :binary,
-        packet: :line,
+        packet: :raw,
         active: false,
         reuseaddr: true,
         ip: {0, 0, 0, 0}

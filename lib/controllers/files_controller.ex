@@ -1,7 +1,10 @@
 defmodule Controllers.FilesController do
   alias Protocol.{HTTPRequest, HTTPResponse}
 
-  defp directory, do: Application.get_env(:codecrafters_http_server, :directory, ".")
+  defp directory,
+    do:
+      Application.get_env(:codecrafters_http_server, :directory) || System.get_env("DIRECTORY") ||
+        "."
 
   def read(%HTTPRequest{line: %{target: "/files" <> path}}) do
     case File.read(Path.join(directory(), path)) do
