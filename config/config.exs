@@ -3,8 +3,8 @@ import Config
 # Dummy credentials — Floci (LocalStack-style) accepts anything, but ex_aws
 # still requires them to be present or it errors before making the request.
 config :ex_aws,
-  access_key_id: Sytem.get_env("AWS_ACCESS_KEY") || "test",
-  secret_access_key: "test",
+  access_key_id: System.get_env("AWS_ACCESS_KEY_ID", "test"),
+  secret_access_key: System.get_env("AWS_ACCESS_KEY", "test"),
   region: "us-east-1"
 
 # Point the S3 client at the local Floci endpoint instead of real AWS.
