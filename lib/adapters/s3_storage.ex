@@ -17,7 +17,7 @@ defmodule S3Storage do
     end
   end
 
-    def generate_presigned_download_url(opts) do
+  def generate_presigned_download_url(opts) do
     with {:ok, storage_path} <- fetch_key(opts, :storage_path) do
       presigned_url(:get, storage_path,
         expires_in: Keyword.get(opts, :expires_in, FileStorage.presigned_url_lifetime_seconds())
@@ -53,11 +53,19 @@ defmodule S3Storage do
     end
   end
 
+  defp presigned_url(http_method, storage_path, opts) do
+    ExAws.Config.new(:s3, ex_aws_s3_config())
+    |> S3.presigned_url(http_method, bucket(), storage_path, opts)
+    |> handle_presign()
+  end
+
   defp aws_request(operation) do
     operation
     |> ExAws.request(ex_aws_s3_config())
     |> handle_response()
   end
+
+  defp handle_response({:ok, response}), do: {:ok, response}
 
   def fetch do
     S3.list_objects(bucket()) |> ExAws.request!()
