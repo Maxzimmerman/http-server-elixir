@@ -1,6 +1,8 @@
 defmodule S3Storage do
   alias ExAws.S3
 
+  require Logger
+
   def upload_to_bucket do
     S3.put_object(bucket())
   end
@@ -57,7 +59,7 @@ defmodule S3Storage do
   defp fetch_key(opts, key) do
     case Keyword.fetch(opts, key) do
       {:ok, value} -> {:ok, value}
-      :error -> deprecated_error(:invalid_input, detail: "#{key} is required")
+      :error -> Logger.info("- - #{__MODULE__}.fetch_key (malformed key in opts)")
     end
   end
 
