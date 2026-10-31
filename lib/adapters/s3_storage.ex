@@ -3,10 +3,6 @@ defmodule S3Storage do
 
   require Logger
 
-  def upload_to_bucket do
-    S3.put_object(bucket())
-  end
-
   def process_upload(opts) do
     with {:ok, storage_path} <- storage_path(opts),
          {:ok, content_type} <- fetch_key(opts, :content_type),
@@ -22,7 +18,7 @@ defmodule S3Storage do
   def generate_presigned_download_url(opts) do
     with {:ok, storage_path} <- fetch_key(opts, :storage_path) do
       presigned_url(:get, storage_path,
-        expires_in: Keyword.get(opts, :expires_in, FileStorage.presigned_url_lifetime_seconds())
+        expires_in: Keyword.get(opts, :expires_in, 15 * 60)
       )
     end
   end
