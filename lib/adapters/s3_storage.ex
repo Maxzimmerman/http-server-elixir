@@ -46,6 +46,17 @@ defmodule S3Storage do
     end
   end
 
+  defp storage_path(opts) do
+    with {:ok, file_name} <- fetch_key(opts, :file_name),
+         {:ok, owner_type} <- fetch_key(opts, :owner_type),
+         {:ok, owner_id} <- fetch_key(opts, :owner_id) do
+      timestamp_ms = DateTime.utc_now() |> DateTime.to_unix(:millisecond)
+      safe_file_name = String.replace(file_name, ~r/[^a-zA-Z0-9_-]/, "_")
+
+      {:ok, "#{owner_type}_#{owner_id}/#{safe_file_name}_#{timestamp_ms}"}
+    end
+  end
+
   defp fetch_key(opts, key) do
     case Keyword.fetch(opts, key) do
       {:ok, value} -> {:ok, value}
