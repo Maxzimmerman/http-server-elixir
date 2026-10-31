@@ -74,6 +74,7 @@ defmodule S3Storage do
   end
 
   defp handle_response({:ok, response}), do: {:ok, response}
+  defp handle_presign({:ok, url}), do: {:ok, url}
 
   def fetch do
     S3.list_objects(bucket()) |> ExAws.request!()
