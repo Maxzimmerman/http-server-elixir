@@ -3,7 +3,7 @@ defmodule Controllers.AWSFilesController do
 
   def read(%HTTPRequest{line: %{target: "/upload" <> path}}) do
     with {:ok, storage_path} <- S3Storage.generate_presigned_download_url(opts(path, "")) do
-      IO.puts(storage_path)
+      {:ok, HTTPResponse.build(:ok, content_type: "", body: storage_path)}
     end
   end
 
