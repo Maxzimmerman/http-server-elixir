@@ -5,7 +5,6 @@ defmodule S3Storage do
     S3.put_object(bucket())
   end
 
-
   def process_upload(opts) do
     with {:ok, storage_path} <- storage_path(opts),
          {:ok, content_type} <- fetch_key(opts, :content_type),
@@ -44,6 +43,13 @@ defmodule S3Storage do
     with {:ok, storage_key} <- fetch_key(opts, :storage_key),
          {:ok, _response} <- bucket() |> S3.delete_object(storage_key) |> aws_request() do
       {:ok, storage_key}
+    end
+  end
+
+  defp fetch_key(opts, key) do
+    case Keyword.fetch(opts, key) do
+      {:ok, value} -> {:ok, value}
+      :error -> deprecated_error(:invalid_input, detail: "#{key} is required")
     end
   end
 
