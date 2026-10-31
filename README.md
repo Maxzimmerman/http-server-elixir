@@ -81,8 +81,6 @@ curl -v --data "12345" \
   -H "Content-Type: application/octet-stream" \
   http://localhost:4000/s3_files/a.txt
 
-
-echo -n "file contents here" > /tmp/foo.txt
 curl -v http://localhost:4221/s3_files/foo.txt
 ```
 
