@@ -27,6 +27,12 @@ defmodule Controllers.AWSFilesController do
   end
 
   defp opts(file_name, content_type) do
-    []
+    [
+      file_name: file_name,
+      owner_type: "company",
+      owner_id: "1",
+      content_type: content_type,
+      file_binary: "bytes"
+    ]
   end
 end
