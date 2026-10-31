@@ -75,12 +75,14 @@ curl -v --data "12345" -H "Content-Type: application/octet-stream" \
 # Connection: close — the server echoes a `Connection: close` response header
 # and closes the connection after responding
 curl -v -H "Connection: close" http://localhost:4221/echo/hello
+
+curl -v --data "12345" \
+  -H "Connection: close" \
+  -H "Content-Type: application/octet-stream" \
+  http://localhost:4000/upload/a.txt
 ```
 
 Use `curl -v` to inspect the status line and headers (`Content-Type`,
 `Content-Length`, etc.), which is what most stages are tested on.
 
-curl -v --data "12345" \
-  -H "Connection: close" \
-  -H "Content-Type: application/octet-stream" \
-  http://localhost:4000/files/newfile.txt
+
