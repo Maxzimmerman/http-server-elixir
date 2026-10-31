@@ -12,7 +12,8 @@ defmodule Orchestrator do
     {"GET", "/files"} => {Controllers.FilesController, :read},
     {"POST", "/files"} => {Controllers.FilesController, :write},
     {"GET", "/health"} => {Controllers.HealthController, :index},
-    {"GET", "/s3_files"} => {Controllers.AWSFilesController, :read}
+    {"GET", "/s3_files"} => {Controllers.AWSFilesController, :read},
+    {"POST", "/s3_files"} => {Controllers.AWSFilesController, :write}
   }
 
   def delegate_request(%HTTPRequest{line: %{method: method, target: target}} = request) do
