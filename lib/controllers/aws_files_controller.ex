@@ -25,4 +25,8 @@ defmodule Controllers.AWSFilesController do
       {:error, _reason} -> {:error, HTTPResponse.build(:not_found)}
     end
   end
+
+  defp opts(file_name, content_type) do
+    []
+  end
 end
