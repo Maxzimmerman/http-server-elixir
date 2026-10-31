@@ -27,7 +27,6 @@ defmodule S3Storage do
     end
   end
 
-  @impl true
   def put_object(opts) do
     with {:ok, storage_key} <- fetch_key(opts, :storage_key),
          {:ok, content_type} <- fetch_key(opts, :content_type),
@@ -40,7 +39,6 @@ defmodule S3Storage do
     end
   end
 
-  @impl true
   def delete_object(opts) do
     with {:ok, storage_key} <- fetch_key(opts, :storage_key),
          {:ok, _response} <- bucket() |> S3.delete_object(storage_key) |> aws_request() do

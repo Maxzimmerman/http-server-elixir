@@ -1,14 +1,6 @@
 defmodule Controllers.AWSFilesController do
   alias Protocol.{HTTPRequest, HTTPResponse}
 
-  @opts [
-    file_name: "a.pdf",
-    owner_type: "company",
-    owner_id: "1",
-    content_type: "application/pdf",
-    file_binary: "bytes"
-  ]
-
   def read(%HTTPRequest{line: %{target: "/upload" <> path}}) do
     case File.read(Path.join(directory(), path)) do
       {:ok, binary} ->
