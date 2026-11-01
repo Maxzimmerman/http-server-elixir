@@ -42,9 +42,7 @@ defmodule S3Storage do
 
   defp storage_path(opts) do
     with {:ok, file_name} <- fetch_key(opts, :file_name) do
-      safe_file_name = String.replace(file_name, ~r/[^a-zA-Z0-9_-]/, "_")
-
-      {:ok, "#{safe_file_name}"}
+      {:ok, "#{file_name}"}
     end
   end
 
