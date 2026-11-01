@@ -11,7 +11,11 @@ defmodule Controllers.AWSFilesController do
     ]
 
     with {:ok, storage_path} <- S3Storage.generate_presigned_download_url(opts) do
-      {:ok, HTTPResponse.build(:ok, content_type: HTTPResponse.content_type(content_type), body: storage_path)}
+      {:ok,
+       HTTPResponse.build(:ok,
+         content_type: HTTPResponse.content_type(content_type),
+         body: storage_path
+       )}
     end
   end
 
@@ -45,15 +49,15 @@ defmodule Controllers.AWSFilesController do
 
   def delete(%HTTPRequest{
         line: %{target: "/s3_files" <> path},
-        headers: %{"content-type" => content_type},
-        body: body
+        headers: %{"content-type" => content_type}
       }) do
     opts = [
-      storage_path: path,
+      storage_path: path
     ]
 
     with {:ok, storage_key} <- S3Storage.delete_object(opts) do
-      {:ok, HTTPResponse.build(:ok,
+      {:ok,
+       HTTPResponse.build(:ok,
          content_type: HTTPResponse.content_type(content_type),
          body: storage_key
        )}
