@@ -8,12 +8,17 @@ defmodule Controllers.AWSFilesController do
     end
   end
 
-  def write(%HTTPRequest{line: %{target: "/s3_files" <> path}, body: body}) do
-    IO.inspect(opts(path, "", body))
+  def write(
+        %HTTPRequest{
+          line: %{target: "/s3_files" <> path},
+          headers: %{"content-type" => content_type},
+          body: body
+        }
+      ) do
 
     opts = [
       file_name: path,
-      content_type: HTTPResponse.octet_stream_content(),
+      content_type: content_type,
       file_binary: body
     ]
 
