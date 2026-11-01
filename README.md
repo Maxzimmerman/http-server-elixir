@@ -89,6 +89,8 @@ curl -v -H "Connection: close" \
 
 DELETE
 
+curl -X DELETE http://localhost:4221/s3_files/a.txt \
+  -H "Content-Type: application/octet-stream"
 ```
 
 Use `curl -v` to inspect the status line and headers (`Content-Type`,
