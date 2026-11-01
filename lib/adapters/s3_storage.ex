@@ -53,7 +53,7 @@ defmodule S3Storage do
   defp fetch_key(opts, key) do
     case Keyword.fetch(opts, key) do
       {:ok, value} -> {:ok, value}
-      :error -> Logger.info("- - #{__MODULE__}.fetch_key (malformed key in opts)")
+      :error -> Logger.info("- - #{__MODULE__}.fetch_key #{key} not in #{inspect(opts)} (malformed key in opts)")
     end
   end
 
