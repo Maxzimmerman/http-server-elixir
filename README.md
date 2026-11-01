@@ -59,29 +59,29 @@ Then, from another terminal:
 
 ```sh
 # Echo endpoint — responds with the path segment as the body
-curl -v http://localhost:4221/echo/hello
+curl -v http://localhost:4000/echo/hello
 
 # User-Agent endpoint — responds with the User-Agent header value
-curl -v -H "User-Agent: foobar/1.2.3" http://localhost:4221/user-agent
+curl -v -H "User-Agent: foobar/1.2.3" http://localhost:4000/user-agent
 
 # Files endpoint (GET) — reads a file from --directory
 echo -n "file contents here" > /tmp/foo.txt
-curl -v http://localhost:4221/files/foo.txt
+curl -v http://localhost:4000/files/foo.txt
 
 # Files endpoint (POST) — writes a file into --directory
 curl -v --data "12345" -H "Content-Type: application/octet-stream" \
-  http://localhost:4221/files/newfile.txt
+  http://localhost:4000/files/newfile.txt
 
 # Connection: close — the server echoes a `Connection: close` response header
 # and closes the connection after responding
-curl -v -H "Connection: close" http://localhost:4221/echo/hello
+curl -v -H "Connection: close" http://localhost:4000/echo/hello
 
 curl -v --data "12345" \
   -H "Connection: close" \
   -H "Content-Type: application/octet-stream" \
   http://localhost:4000/s3_files/a.txt
 
-curl -v http://localhost:4221/s3_files/foo.txt
+curl -v http://localhost:4000/s3_files/foo.txt \ 
 ```
 
 Use `curl -v` to inspect the status line and headers (`Content-Type`,
