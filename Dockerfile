@@ -12,5 +12,11 @@ COPY mix.exs ./
 RUN mix deps.get
 
 COPY . .
+RUN mix escript.build
 
-CMD ["bin/app", "start"]
+EXPOSE 4221
+
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+CMD ["/entrypoint.sh"]

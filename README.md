@@ -101,7 +101,7 @@ docker build -t http-server .
 
 run container with image
 
-docker run --rm -p 4221:4221 http-server
+docker run --rm -e PORT=4000 -p 4000:4000 http-server
 ```
 
 Use `curl -v` to inspect the status line and headers (`Content-Type`,
