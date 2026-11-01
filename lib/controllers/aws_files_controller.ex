@@ -12,12 +12,12 @@ defmodule Controllers.AWSFilesController do
     IO.inspect(opts(path, "", body))
 
     opts = [
-      storage_key: file_name,
-      content_type: content_type,
-      file_binary: content
+      storage_key: path,
+      content_type: HTTPResponse.octet_stream_content(),
+      file_binary: body
     ]
 
-    with {:ok, storage_path} <- S3Storage.process_upload(opts(path, "", body)) do
+    with {:ok, storage_path} <- S3Storage.process_upload(opts) do
       IO.inspect(storage_path, label: "TEST")
       {:ok, HTTPResponse.build(:ok, content_type: "", body: storage_path)}
     end
