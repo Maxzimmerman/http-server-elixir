@@ -52,7 +52,7 @@ defmodule Controllers.AWSFilesController do
         headers: %{"content-type" => content_type}
       }) do
     opts = [
-      storage_path: path
+      storage_key: path
     ]
 
     with {:ok, storage_key} <- S3Storage.delete_object(opts) do
