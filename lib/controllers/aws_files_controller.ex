@@ -16,7 +16,7 @@ defmodule Controllers.AWSFilesController do
   end
 
   def read(%HTTPRequest{}) do
-    HTTPResponse.build(:bad_request)
+    {:ok, HTTPResponse.build(:bad_request)}
   end
 
   def write(%HTTPRequest{
