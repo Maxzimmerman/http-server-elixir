@@ -89,7 +89,7 @@ curl -v -H "Connection: close" \
 
 DELETE
 
-curl -X DELETE http://localhost:4221/s3_files/a.txt \
+curl -X DELETE http://localhost:4000/s3_files/a.txt \
   -H "Content-Type: application/octet-stream"
 ```
 
