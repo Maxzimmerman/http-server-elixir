@@ -24,7 +24,7 @@ defmodule Controllers.AWSFilesController do
 
     with {:ok, storage_path} <- S3Storage.process_upload(opts) do
       IO.inspect(storage_path, label: "TEST")
-      {:ok, HTTPResponse.build(:ok, content_type: content_type, body: storage_path)}
+      {:ok, HTTPResponse.build(:ok, content_type: HTTPResponse.octet_stream_content(), body: storage_path)}
     end
   end
 
