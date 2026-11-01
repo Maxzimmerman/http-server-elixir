@@ -93,6 +93,16 @@ curl -X DELETE http://localhost:4000/s3_files/a.txt \
   -H "Content-Type: application/octet-stream"
 ```
 
+DOCKER
+
+```
+create image 
+docker build -t http-server .
+
+run container with image
+
+```
+
 Use `curl -v` to inspect the status line and headers (`Content-Type`,
 `Content-Length`, etc.), which is what most stages are tested on.
 
