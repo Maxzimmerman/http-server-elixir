@@ -55,7 +55,7 @@ defmodule Controllers.AWSFilesController do
     with {:ok, storage_key} <- S3Storage.delete_object(opts) do
       {:ok, HTTPResponse.build(:ok,
          content_type: HTTPResponse.content_type(content_type),
-         body: storage_path
+         body: storage_key
        )}
     end
   end
