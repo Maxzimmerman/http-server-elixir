@@ -10,6 +10,13 @@ defmodule Controllers.AWSFilesController do
 
   def write(%HTTPRequest{line: %{target: "/s3_files" <> path}, body: body}) do
     IO.inspect(opts(path, "", body))
+
+    opts = [
+      storage_key: file_name,
+      content_type: content_type,
+      file_binary: content
+    ]
+
     with {:ok, storage_path} <- S3Storage.process_upload(opts(path, "", body)) do
       IO.inspect(storage_path, label: "TEST")
       {:ok, HTTPResponse.build(:ok, content_type: "", body: storage_path)}

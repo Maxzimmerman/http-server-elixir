@@ -17,9 +17,7 @@ defmodule S3Storage do
 
   def generate_presigned_download_url(opts) do
     with {:ok, storage_path} <- fetch_key(opts, :storage_path) do
-      presigned_url(:get, storage_path,
-        expires_in: Keyword.get(opts, :expires_in, 15 * 60)
-      )
+      presigned_url(:get, storage_path, expires_in: Keyword.get(opts, :expires_in, 15 * 60))
     end
   end
 
@@ -52,8 +50,13 @@ defmodule S3Storage do
 
   defp fetch_key(opts, key) do
     case Keyword.fetch(opts, key) do
-      {:ok, value} -> {:ok, value}
-      :error -> Logger.info("- - #{__MODULE__}.fetch_key #{key} not in #{inspect(opts)} (malformed key in opts)")
+      {:ok, value} ->
+        {:ok, value}
+
+      :error ->
+        Logger.info(
+          "- - #{__MODULE__}.fetch_key #{key} not in #{inspect(opts)} (malformed key in opts)"
+        )
     end
   end
 

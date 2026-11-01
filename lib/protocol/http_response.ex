@@ -21,6 +21,9 @@ defmodule Protocol.HTTPResponse do
     octet_stream: "application/octet-stream"
   }
 
+  def text_content, do: "text/plain"
+  def octet_stream_content, do: "application/octet-stream"
+
   @supported_encodings ["gzip"]
 
   @spec build(status(), keyword()) :: binary()
