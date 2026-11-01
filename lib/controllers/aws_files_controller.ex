@@ -38,4 +38,29 @@ defmodule Controllers.AWSFilesController do
        )}
     end
   end
+
+  def write(%HTTPRequest{}) do
+    {:ok, HTTPResponse.build(:bad_request)}
+  end
+
+  def delete(%HTTPRequest{
+        line: %{target: "/s3_files" <> path},
+        headers: %{"content-type" => content_type},
+        body: body
+      }) do
+    opts = [
+      storage_path: path,
+    ]
+
+    with {:ok, storage_key} <- S3Storage.delete_object(opts) do
+      {:ok, HTTPResponse.build(:ok,
+         content_type: HTTPResponse.content_type(content_type),
+         body: storage_path
+       )}
+    end
+  end
+
+  def delete(%HTTPRequest{}) do
+    {:ok, HTTPResponse.build(:bad_request)}
+  end
 end
