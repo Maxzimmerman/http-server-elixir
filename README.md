@@ -76,14 +76,19 @@ curl -v --data "12345" -H "Content-Type: application/octet-stream" \
 # and closes the connection after responding
 curl -v -H "Connection: close" http://localhost:4000/echo/hello
 
+UPLOAD
 curl -v --data "12345" \
   -H "Connection: close" \
   -H "Content-Type: application/octet-stream" \
   http://localhost:4000/s3_files/a.txt
 
+DOWNLOAD
 curl -v -H "Connection: close" \
   -H "Content-Type: application/octet-stream" \
   http://localhost:4000/s3_files/foo.txt 
+
+DELETE
+
 ```
 
 Use `curl -v` to inspect the status line and headers (`Content-Type`,
