@@ -11,7 +11,7 @@ defmodule Controllers.AWSFilesController do
     ]
 
     with storage_path <- S3Storage.generate_presigned_download_url(opts) do
-      {:ok, HTTPResponse.build(:ok, content_type: HTTPResponse.octet_stream_content(), body: storage_path)}
+      {:ok, HTTPResponse.build(:ok, content_type: HTTPResponse.content_type(content_type), body: storage_path)}
     end
   end
 
@@ -33,7 +33,7 @@ defmodule Controllers.AWSFilesController do
     with {:ok, storage_path} <- S3Storage.process_upload(opts) do
       {:ok,
        HTTPResponse.build(:ok,
-         content_type: HTTPResponse.octet_stream_content(),
+         content_type: HTTPResponse.content_type(content_type),
          body: storage_path
        )}
     end

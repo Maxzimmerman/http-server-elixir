@@ -21,8 +21,8 @@ defmodule Protocol.HTTPResponse do
     octet_stream: "application/octet-stream"
   }
 
-  def text_content, do: :text
-  def octet_stream_content, do: :octet_stream
+  def content_type("application/octet-stream"), do: :octet_stream
+  def content_type("text/plain"), do: :text
 
   @supported_encodings ["gzip"]
 
