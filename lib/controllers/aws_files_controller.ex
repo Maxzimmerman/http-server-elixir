@@ -15,6 +15,10 @@ defmodule Controllers.AWSFilesController do
     end
   end
 
+  def read(%HTTPRequest{}) do
+    HTTPResponse.build(:bad_request)
+  end
+
   def write(%HTTPRequest{
         line: %{target: "/s3_files" <> path},
         headers: %{"content-type" => content_type},
