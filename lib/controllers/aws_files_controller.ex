@@ -12,7 +12,7 @@ defmodule Controllers.AWSFilesController do
     IO.inspect(opts(path, "", body))
 
     opts = [
-      storage_key: path,
+      file_name: path,
       content_type: HTTPResponse.octet_stream_content(),
       file_binary: body
     ]
