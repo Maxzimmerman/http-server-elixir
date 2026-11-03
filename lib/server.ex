@@ -2,12 +2,19 @@ defmodule Server do
   use Application
 
   def start(_type, _args) do
+    # Attach event handlers before anything can serve a request, so no request
+    # fires the event un-hooked. The metrics reporter attaches its own handlers
+    # when it starts as a supervised child below.
+    Telemetry.Handler.attach()
+
     opts = [strategy: :one_for_one]
 
-    children = [{Task, fn -> Adapters.HTTPServer.listen() end}]
-    Supervisor.start_link(children,
-      opts
-    )
+    children = [
+      Telemetry.Reporter,
+      {Task, fn -> Adapters.HTTPServer.listen() end}
+    ]
+
+    Supervisor.start_link(children, opts)
   end
 
   def main(_args) do
