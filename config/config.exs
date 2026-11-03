@@ -16,3 +16,11 @@ config :ex_aws, :s3,
   host: "localhost",
   port: 4566,
   bucket: "http-server-bucket"
+
+
+config :logger, :default_handler,
+  formatter: {LoggerJSON.Formatters.Datadog, metadata: :all},
+  config: [
+    file: ~c"log/app.log",
+    filesync_repeat_interval: 5_000
+  ]
