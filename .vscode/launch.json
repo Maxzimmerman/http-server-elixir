@@ -1,0 +1,54 @@
+{
+  // ElixirLS debug configurations.
+  //
+  // Verified working with ElixirLS 0.31.1 on Elixir 1.19.4 / OTP 28:
+  // breakpoints attach and stop execution. Open "Run and Debug" (Shift+Cmd+D),
+  // pick a config, set a gutter breakpoint, press F5.
+  //
+  // Note: the app auto-starts the HTTP listener (mix.exs `mod: {Server, []}`)
+  // and the /health path calls S3 — have Floci running on localhost:4566 or
+  // those requests will fail with :econnrefused.
+  "version": "0.2.0",
+  "configurations": [
+    {
+      // Run the whole test suite under the debugger.
+      "type": "mix_task",
+      "name": "mix test",
+      "request": "launch",
+      "task": "test",
+      "taskArgs": ["--trace"],
+      "startApps": true,
+      "projectDir": "${workspaceRoot}",
+      "requireFiles": [
+        "test/**/test_helper.exs",
+        "test/**/*_test.exs"
+      ]
+    },
+    {
+      // Debug only the test file currently open in the editor.
+      "type": "mix_task",
+      "name": "mix test (current file)",
+      "request": "launch",
+      "task": "test",
+      "taskArgs": ["${relativeFile}", "--trace"],
+      "startApps": true,
+      "projectDir": "${workspaceRoot}",
+      "requireFiles": [
+        "test/**/test_helper.exs",
+        "test/**/*_test.exs"
+      ]
+    },
+    {
+      // Boot the app (HTTP server) under the debugger. Requires Floci on :4566
+      // for any S3-backed route to work.
+      "type": "mix_task",
+      "name": "run server (mix run)",
+      "request": "launch",
+      "task": "run",
+      "taskArgs": ["--no-halt"],
+      "exitAfterTaskReturns": false,
+      "startApps": true,
+      "projectDir": "${workspaceRoot}"
+    }
+  ]
+}
