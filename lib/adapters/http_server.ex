@@ -88,15 +88,17 @@ defmodule Adapters.HTTPServer do
     end
   end
 
-  # One access-log line per served request: method, target, the status we sent,
-  # the response size on the wire, and how long building the response took.
+  # Emit one telemetry event per served request. We only *execute* here — the
+  # handlers (metrics reporter + access log) are attached once at startup, not
+  # per request. `duration` is the measurement metrics aggregate on; `method`
+  # and `status` are low-cardinality tags, while `path` rides along in metadata
+  # for the access log but is deliberately NOT a metric tag (every `/echo/<x>`
+  # would be a distinct timeseries).
   defp log_served(%HTTPRequest{line: %{method: method, target: target}}, response, micros) do
-    :telemetry.attach(
-      # unique handler id
-      "log-response-handler",
+    :telemetry.execute(
       [:web, :request, :done],
-      &Telemetry.Handler.handle_event/4,
-      nil
+      %{duration: micros},
+      %{method: method, path: target, status: HTTPResponse.status_code(response)}
     )
   end
 
