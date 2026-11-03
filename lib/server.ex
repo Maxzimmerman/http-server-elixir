@@ -2,8 +2,9 @@ defmodule Server do
   use Application
 
   def start(_type, _args) do
+    opts = [strategy: :one_for_one]
     Supervisor.start_link([{Task, fn -> Adapters.HTTPServer.listen() end}],
-      strategy: :one_for_one
+      opts
     )
   end
 
