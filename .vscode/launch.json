@@ -48,6 +48,15 @@
       "taskArgs": ["--no-halt"],
       "exitAfterTaskReturns": false,
       "startApps": true,
+      // Only interpret modules you actually set a breakpoint in. With the
+      // default (true), ElixirLS interprets EVERY app module, and the `:int`
+      // evaluator crashes on `Orchestrator`'s `apply/3` dispatch — killing the
+      // request worker mid-flight ("Connection reset by peer").
+      "debugAutoInterpretAllModules": false,
+      // Belt-and-suspenders: never interpret the dispatcher, so a stray
+      // breakpoint there can't crash the evaluator. Break in the target
+      // controller (e.g. Controllers.HealthController) instead.
+      "excludeModules": ["Orchestrator"],
       "projectDir": "${workspaceRoot}"
     }
   ]

@@ -108,3 +108,10 @@ Use `curl -v` to inspect the status line and headers (`Content-Type`,
 `Content-Length`, etc.), which is what most stages are tested on.
 
 
+Debug AWS
+
+```
+sudo cat /var/log/cloud-init-output.log
+```
+
+
