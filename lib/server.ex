@@ -3,7 +3,9 @@ defmodule Server do
 
   def start(_type, _args) do
     opts = [strategy: :one_for_one]
-    Supervisor.start_link([{Task, fn -> Adapters.HTTPServer.listen() end}],
+
+    children = [{Task, fn -> Adapters.HTTPServer.listen() end}]
+    Supervisor.start_link(children,
       opts
     )
   end
