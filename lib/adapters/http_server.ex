@@ -90,9 +90,10 @@ defmodule Adapters.HTTPServer do
   # One access-log line per served request: method, target, the status we sent,
   # the response size on the wire, and how long building the response took.
   defp log_served(%HTTPRequest{line: %{method: method, target: target}}, response, micros) do
-    Logger.info(
-      "#{method} #{target} #{HTTPResponse.status_code(response)} " <>
-        "#{byte_size(response)}B #{Float.round(micros / 1000, 1)}ms"
+    :telemetry.execute(
+      [:web, :request, :done],
+      %{latency: Float.round(micros / 1000, 1)},
+      %{request_path: target, status_code: :failed}
     )
   end
 
