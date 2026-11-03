@@ -18,9 +18,9 @@ config :ex_aws, :s3,
   bucket: "http-server-bucket"
 
 
+# Log as Datadog-shaped JSON to stdout. In a container the Datadog Agent
+# collects stdout via the Docker socket — reliable on macOS, unlike tailing a
+# bind-mounted file, whose appends Docker Desktop doesn't propagate into the
+# Agent container. Locally, `mix run` prints the same JSON to the terminal.
 config :logger, :default_handler,
-  formatter: {LoggerJSON.Formatters.Datadog, metadata: :all},
-  config: [
-    file: ~c"log/app.log",
-    filesync_repeat_interval: 5_000
-  ]
+  formatter: {LoggerJSON.Formatters.Datadog, metadata: :all}

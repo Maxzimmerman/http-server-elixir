@@ -108,6 +108,149 @@ Use `curl -v` to inspect the status line and headers (`Content-Type`,
 `Content-Length`, etc.), which is what most stages are tested on.
 
 
+# Observability — metrics + logs to Datadog
+
+The server ships two signals to Datadog, both built on the `:telemetry` event
+`[:web, :request, :done]` that `Adapters.HTTPServer` emits once per served
+request (measurement `duration`; metadata `method` / `path` / `status`):
+
+- **Metrics** — `Telemetry.Reporter` runs `TelemetryMetricsStatsd` (DogStatsD,
+  `:datadog` format) and forwards two metrics, tagged by `method` + `status`:
+  - `web.request.done.count` — request count
+  - `web.request.done.duration` — response-build latency (ms) distribution
+- **Logs** — `Telemetry.Handler` logs one structured line per request; the
+  `LoggerJSON.Formatters.Datadog` formatter writes it as JSON to **stdout**. The
+  app runs as a container and the Datadog Agent collects its stdout via the
+  Docker socket. Searchable fields: `status`, `method`, `path`, `duration_ms`.
+
+Nothing talks to Datadog's API directly — the app sends to a local **Datadog
+Agent** (DogStatsD UDP for metrics, Docker-socket stdout collection for logs)
+and the Agent forwards. App and Agent share a user-defined Docker network
+(`dd-net`) so the app can reach the Agent by name for metrics.
+
+## Dependencies (already in `mix.exs`)
+
+```elixir
+{:telemetry_metrics, "~> 1.0"},
+{:telemetry_metrics_statsd, "~> 0.7"},   # metrics → DogStatsD
+{:logger_json, "~> 7.0"},                # Datadog JSON log formatter
+{:jason, "~> 1.4"}                        # encoder logger_json needs (not Poison)
+```
+
+## Logger config (already in `config/config.exs`)
+
+```elixir
+# Log Datadog-shaped JSON to stdout; the Agent collects container stdout via
+# the Docker socket (reliable on macOS, unlike tailing a bind-mounted file).
+config :logger, :default_handler,
+  formatter: {LoggerJSON.Formatters.Datadog, metadata: :all}
+```
+
+## Why the app runs as a container
+
+On Docker Desktop for Mac the Agent **can't reliably tail a bind-mounted log
+file** — the VM file-sharing layer doesn't propagate appends into the Agent
+container (it reads the file once and never sees it grow). So the app runs as a
+container and the Agent collects its **stdout** through the Docker socket. App
+and Agent share a user-defined network (`dd-net`) so metrics (DogStatsD UDP) can
+reach the Agent by name.
+
+## 1. Build the image and create the network
+
+```sh
+docker network create dd-net
+docker build --ulimit nofile=65536:65536 -t http-server:latest .
+```
+
+## 2. Run the Datadog Agent
+
+Get a Datadog **API key** (Organization Settings → API Keys). Non-obvious flags:
+
+- `DD_SITE=ap2.datadoghq.com` — must match your account's region; a key sent to
+  the wrong site 403s with "API key is missing or invalid".
+- `DD_HOSTNAME` — the Agent can't derive a hostname on Docker Desktop and exits
+  without it.
+- `DD_DOGSTATSD_NON_LOCAL_TRAFFIC=true` — accept DogStatsD from the app container.
+- the Docker socket mount is how the Agent reads container stdout.
+  `container_collect_all` is left **off**, so only containers carrying a
+  `com.datadoghq.ad.logs` label are collected (just the app) — not every
+  container on the machine.
+
+```sh
+docker run -d --name dd-agent \
+  --network dd-net \
+  -e DD_API_KEY=<your-datadog-api-key> \
+  -e DD_SITE=ap2.datadoghq.com \
+  -e DD_HOSTNAME=codecrafters-dev \
+  -e DD_DOGSTATSD_NON_LOCAL_TRAFFIC=true \
+  -e DD_APM_ENABLED=false \
+  -e DD_LOGS_ENABLED=true \
+  -v /var/run/docker.sock:/var/run/docker.sock:ro \
+  gcr.io/datadoghq/agent:7
+```
+
+## 3. Run the app container
+
+`DD_AGENT_HOST=dd-agent` points the metrics reporter at the Agent over `dd-net`;
+the `com.datadoghq.ad.logs` label tells the Agent to collect this container's
+stdout and tags it with the service/source.
+
+```sh
+docker run -d --name http-server \
+  --network dd-net \
+  -e PORT=4221 \
+  -e DD_AGENT_HOST=dd-agent \
+  -e DD_DOGSTATSD_PORT=8125 \
+  -p 4221:4221 \
+  -l 'com.datadoghq.ad.logs=[{"source":"elixir","service":"codecrafters-http-server"}]' \
+  http-server:latest
+```
+
+## 4. Generate traffic
+
+```sh
+for i in $(seq 1 10); do
+  curl -s -o /dev/null localhost:4221/
+  curl -s -o /dev/null localhost:4221/echo/hi
+  curl -s -o /dev/null localhost:4221/nope
+done
+```
+
+## 5. Verify
+
+```sh
+# App stdout is clean JSON with the fields (not FORMATTER CRASH):
+docker logs http-server | grep request.done | tail -1
+
+# Metrics reached the Agent (over dd-net):
+docker exec dd-agent agent status | grep -i "Metric Packets"
+docker exec dd-agent agent dogstatsd-stats                        # per metric+tag breakdown
+
+# Logs collected — ONLY the app container, shipped with no retries:
+docker exec dd-agent agent status | grep -iA40 "Logs Agent" \
+  | grep -iE "Service:|Source:|LogsSent|RetryCount"
+
+# API key accepted (no 403s), forwarder healthy:
+docker exec dd-agent agent status | grep -iA3 "API Keys status"
+docker exec dd-agent agent health
+```
+
+In Datadog (app.ap2.datadoghq.com):
+- **Metrics → Explorer** → `web.request.done.count`, `sum by` `status`/`method`
+- **Logs → Search** → `service:codecrafters-http-server` (facets: `status`,
+  `method`, `path`, `duration_ms`). Widen the time range if you don't see recent
+  ones — logs only exist for moments the app actually served requests.
+
+## Cost notes (free tier / trial)
+
+- **Metrics** bill as *custom metrics* (100/host on Free). Keep tags
+  low-cardinality — `method`/`status` only, never `path` (every `/echo/<x>`
+  would be a new timeseries). The `distribution` expands into several custom
+  metrics; drop it and keep only the `counter` to minimise the count.
+- **Logs** are a separate meter (GB ingested + indexed events), not custom
+  metrics — negligible at personal volume.
+
+
 # Deploying to EC2
 
 This runs the server as a Docker container on an Amazon Linux 2023 EC2

@@ -24,9 +24,11 @@ defmodule Telemetry.Handler do
 
   @doc false
   def handle_event([:web, :request, :done], %{duration: micros}, metadata, _config) do
-    Logger.info(
-      "#{metadata.method} #{metadata.path} -> #{metadata.status} " <>
-        "(#{Float.round(micros / 1000, 1)}ms)"
+    Logger.info("request.done",
+      method: metadata.method,
+      path: metadata.path,
+      status: metadata.status,
+      duration_ms: Float.round(micros / 1000, 1)
     )
   end
 end
