@@ -64,11 +64,11 @@ defmodule Protocol.HTTPResponse do
   defp connection_header(true), do: [{"Connection", "close"}]
   defp connection_header(_), do: []
 
+  # Always emit Content-Length — including 0. On a keep-alive connection the
+  # client has no other way to detect end-of-message, so omitting it on an
+  # empty body (e.g. `GET /`, a bare 404) leaves the client waiting forever.
   defp content_length_header(body) do
-    case IO.iodata_length(body) do
-      0 -> []
-      length -> [{"Content-Length", length}]
-    end
+    [{"Content-Length", IO.iodata_length(body)}]
   end
 
   defp render_headers(headers) do

@@ -68,24 +68,9 @@ defmodule Adapters.HTTPServer do
         :gen_tcp.send(client, response)
         Logger.info("- - #{HTTPResponse.status_code(response)} (malformed request)")
 
-        :telemetry.attach(
-          # unique handler id
-          "log-response-handler",
-          [:web, :request, :done],
-          &Telemetry.Handler.handle_event/4,
-          nil
-        )
         :gen_tcp.close(client)
 
       {:error, _reason} ->
-        :telemetry.attach(
-          # unique handler id
-          "log-response-handler",
-          [:web, :request, :done],
-          &Telemetry.Handler.handle_event/4,
-          nil
-        )
-
         :gen_tcp.close(client)
     end
   end
