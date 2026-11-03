@@ -95,6 +95,14 @@ defmodule Adapters.HTTPServer do
       %{latency: Float.round(micros / 1000, 1)},
       %{request_path: target, status_code: :failed}
     )
+
+    :telemetry.attach(
+      # unique handler id
+      "log-response-handler",
+      [:web, :request, :done],
+      &Telemetry.Handler.handle_event/4,
+      nil
+    )
   end
 
   defp response_for(request) do
