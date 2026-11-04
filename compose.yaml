@@ -1,0 +1,50 @@
+# Runs the app + the Datadog Agent together. Compose puts both services on a
+# default project network, so the app reaches the Agent by service name
+# (DD_AGENT_HOST=dd-agent) — no manual `docker network create` needed.
+#
+# Secret handling: DD_API_KEY is interpolated from a .env file that is NOT
+# committed (see .gitignore). On EC2, user-data writes that .env by pulling the
+# key from SSM Parameter Store at launch. Locally, create your own .env.
+
+services:
+  http-server:
+    build:
+      context: .
+      # avoids Erlang's giant port_tab allocation during the native build
+      args: {}
+    image: http-server:latest
+    container_name: http-server
+    restart: always
+    ports:
+      - "4221:4221"
+    environment:
+      PORT: "4221"
+      # metrics: DogStatsD UDP to the Agent, reached by service name
+      DD_AGENT_HOST: dd-agent
+      DD_DOGSTATSD_PORT: "8125"
+    labels:
+      # tells the Agent to collect THIS container's stdout and tag it
+      com.datadoghq.ad.logs: '[{"source":"elixir","service":"${DD_SERVICE:-codecrafters-http-server}"}]'
+    depends_on:
+      - dd-agent
+
+  dd-agent:
+    image: gcr.io/datadoghq/agent:7
+    container_name: dd-agent
+    restart: always
+    environment:
+      DD_API_KEY: ${DD_API_KEY:?set DD_API_KEY in .env}
+      DD_SITE: ap2.datadoghq.com
+      DD_LOGS_ENABLED: "true"
+      # accept DogStatsD packets from the app container (not localhost)
+      DD_DOGSTATSD_NON_LOCAL_TRAFFIC: "true"
+      DD_APM_ENABLED: "false"
+      # unified service tagging — ties logs/metrics together, filterable by env
+      DD_ENV: ${DD_ENV:-dev}
+      DD_SERVICE: ${DD_SERVICE:-codecrafters-http-server}
+      DD_VERSION: ${DD_VERSION:-unknown}
+      # NOTE: no DD_HOSTNAME here — on EC2 the Agent derives it (plus instance
+      # tags) from instance metadata. Add it back only for Docker Desktop/Mac.
+    volumes:
+      # read-only: how the Agent collects container stdout for logs
+      - /var/run/docker.sock:/var/run/docker.sock:ro
