@@ -26,3 +26,6 @@ erl_crash.dump
 app-*.tar
 
 /.envrc
+
+# Datadog Agent secret for docker compose — never commit the API key
+/.env
